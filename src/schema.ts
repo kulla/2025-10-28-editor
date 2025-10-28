@@ -1,13 +1,13 @@
-export const object = <P extends Record<string, Schema>>(
-  properties: P,
-): ObjectSchema<P> => ({
+export const object = <F extends Record<string, Schema>>(
+  properties: F,
+): ObjectSchema<F> => ({
   kind: 'object',
-  properties,
+  fields: properties,
 })
 
-export const array = <E extends Schema>(element: E): ArraySchema<E> => ({
+export const array = <I extends Schema>(element: I): ArraySchema<I> => ({
   kind: 'array',
-  element,
+  item: element,
 })
 
 export const string = (): StringSchema => ({ kind: 'string' })
@@ -16,15 +16,15 @@ export const boolean = (): BooleanSchema => ({ kind: 'boolean' })
 type Schema = ObjectSchema | ArraySchema | StringSchema | BooleanSchema
 
 interface ObjectSchema<
-  P extends Record<string, Schema> = Record<string, Schema>,
+  F extends Record<string, Schema> = Record<string, Schema>,
 > {
   kind: 'object'
-  properties: P
+  fields: F
 }
 
-interface ArraySchema<E extends Schema = Schema> {
+interface ArraySchema<I extends Schema = Schema> {
   kind: 'array'
-  element: E
+  item: I
 }
 
 interface StringSchema {
