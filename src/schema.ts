@@ -10,12 +10,14 @@ export type Schema =
   | WrapperSchema
   | UnionSchema
 
+export type SchemaKind = Schema['kind']
+
 export interface ObjectSchema<
   F extends Record<string, Schema> = Record<string, Schema>,
 > {
   kind: 'object'
   fields: F
-  fieldOrder: (keyof F)[]
+  fieldOrder: Extract<keyof F, string>[]
 }
 
 export interface ArraySchema<I extends Schema = Schema> {

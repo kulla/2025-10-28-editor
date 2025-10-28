@@ -124,7 +124,7 @@ export class EditorStore {
   }
 }
 
-interface Transaction {
+export interface Transaction {
   /*update<S extends Schema>(
     key: Key,
     updateFn: ((current: FlatValue<S>) => FlatValue<S>) | FlatValue<S>,

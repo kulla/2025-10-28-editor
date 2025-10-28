@@ -23,7 +23,7 @@ export type FlatValue<S extends Schema> = S extends StringSchema
     : S extends ArraySchema
       ? Key[]
       : S extends ObjectSchema
-        ? { [K in keyof S['fields']]: Key }
+        ? [keyof S['fields'], Key][]
         : S extends WrapperSchema
           ? Key
           : S extends UnionSchema
