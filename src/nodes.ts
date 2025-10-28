@@ -29,7 +29,7 @@ const Document = schema({
   kind: 'array',
   item: schema({
     kind: 'union',
-    options: [Content, MultipleChoiceExercise],
+    options: [Paragraph, MultipleChoiceExercise],
   }),
 })
 
