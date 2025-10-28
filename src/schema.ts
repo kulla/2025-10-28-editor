@@ -10,6 +10,11 @@ export const array = <I extends Schema>(element: I): ArraySchema<I> => ({
   item: element,
 })
 
+export const union = <O extends Schema[]>(...options: O): UnionSchema<O> => ({
+  kind: 'union',
+  options,
+})
+
 export const wrapper = <C extends Schema>(child: C): WrapperSchema<C> => ({
   kind: 'wrapper',
   child,
@@ -24,6 +29,7 @@ type Schema =
   | StringSchema
   | BooleanSchema
   | WrapperSchema
+  | UnionSchema
 
 interface ObjectSchema<
   F extends Record<string, Schema> = Record<string, Schema>,
@@ -35,6 +41,11 @@ interface ObjectSchema<
 interface ArraySchema<I extends Schema = Schema> {
   kind: 'array'
   item: I
+}
+
+interface UnionSchema<O extends Schema[] = Schema[]> {
+  kind: 'union'
+  options: O
 }
 
 interface WrapperSchema<C extends Schema = Schema> {
