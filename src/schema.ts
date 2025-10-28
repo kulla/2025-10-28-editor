@@ -1,9 +1,6 @@
 export const object = <F extends Record<string, Schema>>(
-  properties: F,
-): ObjectSchema<F> => ({
-  kind: 'object',
-  fields: properties,
-})
+  fields: F,
+): ObjectSchema<F> => ({ kind: 'object', fields })
 
 export const array = <I extends Schema>(element: I): ArraySchema<I> => ({
   kind: 'array',
@@ -15,9 +12,11 @@ export const union = <O extends Schema[]>(...options: O): UnionSchema<O> => ({
   options,
 })
 
-export const wrapper = <C extends Schema>(child: C): WrapperSchema<C> => ({
+export const wrapper = <C extends Schema>(
+  spec: Omit<WrapperSchema<C>, 'kind'>,
+): WrapperSchema<C> => ({
   kind: 'wrapper',
-  child,
+  ...spec,
 })
 
 export const string = (): StringSchema => ({ kind: 'string' })
@@ -51,6 +50,7 @@ interface UnionSchema<O extends Schema[] = Schema[]> {
 interface WrapperSchema<C extends Schema = Schema> {
   kind: 'wrapper'
   child: C
+  isRoot?: true
 }
 
 interface StringSchema {

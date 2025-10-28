@@ -2,7 +2,7 @@ import * as S from './schema'
 
 const Text = S.string()
 
-const Paragraph = S.wrapper(Text)
+const Paragraph = S.wrapper({ child: Text })
 
 const Content = S.array(Paragraph)
 
@@ -18,4 +18,4 @@ const MultipleChoiceExercide = S.object({
 
 const Document = S.array(S.union(Content, MultipleChoiceExercide))
 
-export const Root = S.wrapper(Document)
+export const Root = S.wrapper({ child: Document, isRoot: true })
