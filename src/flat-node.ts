@@ -9,8 +9,10 @@ import type {
 } from './schema'
 import type { Branded } from './utils/types'
 
-export interface FlatNode<S extends Schema> {
+export interface FlatNode<S extends Schema = Schema> {
   schema: S
+  key: Key
+  parentKey: Key | null
   value: FlatValue<S>
 }
 
