@@ -36,7 +36,6 @@ export interface UnionSchema<O extends Schema[] = Schema[]> {
 export interface WrapperSchema<C extends Schema = Schema> {
   kind: 'wrapper'
   child: C
-  isRoot?: true
 }
 
 export interface StringSchema {

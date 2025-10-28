@@ -36,4 +36,4 @@ const Document = schema({
 })
 
 export type Root = typeof Root
-export const Root = schema({ kind: 'wrapper', child: Document, isRoot: true })
+export const Root = schema({ kind: 'wrapper', child: Document })
