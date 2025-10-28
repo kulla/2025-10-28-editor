@@ -2,7 +2,7 @@ export function schema<S extends Schema>(schema: S): S {
   return schema
 }
 
-type Schema =
+export type Schema =
   | ObjectSchema
   | ArraySchema
   | StringSchema
@@ -10,33 +10,33 @@ type Schema =
   | WrapperSchema
   | UnionSchema
 
-interface ObjectSchema<
+export interface ObjectSchema<
   F extends Record<string, Schema> = Record<string, Schema>,
 > {
   kind: 'object'
   fields: F
 }
 
-interface ArraySchema<I extends Schema = Schema> {
+export interface ArraySchema<I extends Schema = Schema> {
   kind: 'array'
   item: I
 }
 
-interface UnionSchema<O extends Schema[] = Schema[]> {
+export interface UnionSchema<O extends Schema[] = Schema[]> {
   kind: 'union'
   options: O
 }
 
-interface WrapperSchema<C extends Schema = Schema> {
+export interface WrapperSchema<C extends Schema = Schema> {
   kind: 'wrapper'
   child: C
   isRoot?: true
 }
 
-interface StringSchema {
+export interface StringSchema {
   kind: 'string'
 }
 
-interface BooleanSchema {
+export interface BooleanSchema {
   kind: 'boolean'
 }
