@@ -15,12 +15,14 @@ const MultipleChoiceExercise = schema({
       item: schema({
         kind: 'object',
         fields: {
-          text: Text,
           isCorrect: schema({ kind: 'boolean' }),
+          text: Text,
         },
+        fieldOrder: ['isCorrect', 'text'],
       }),
     }),
   },
+  fieldOrder: ['exercise', 'answers'],
 })
 
 const Document = schema({

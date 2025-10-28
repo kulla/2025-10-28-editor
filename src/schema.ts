@@ -15,6 +15,7 @@ export interface ObjectSchema<
 > {
   kind: 'object'
   fields: F
+  fieldOrder: (keyof F)[]
 }
 
 export interface ArraySchema<I extends Schema = Schema> {
