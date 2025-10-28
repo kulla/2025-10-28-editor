@@ -21,8 +21,8 @@ type _JSONValue<S extends Schema> = S extends StringSchema
     ? boolean
     : S extends ArraySchema<infer I>
       ? _JSONValue<I>[]
-      : S extends ObjectSchema<infer F>
-        ? { [K in keyof F]: _JSONValue<F[K]> }
+      : S extends ObjectSchema
+        ? { [K in keyof S['fields']]: _JSONValue<S['fields'][K]> }
         : S extends WrapperSchema<infer C>
           ? _JSONValue<C>
           : S extends UnionSchema<infer O>
