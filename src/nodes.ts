@@ -1,21 +1,34 @@
-import * as S from './schema'
+import { schema } from './schema'
 
-const Text = S.string()
+const Text = schema({ kind: 'string' })
 
-const Paragraph = S.wrapper({ child: Text })
+const Paragraph = schema({ kind: 'wrapper', child: Text })
 
-const Content = S.array(Paragraph)
+const Content = schema({ kind: 'array', item: Paragraph })
 
-const MultipleChoiceExercide = S.object({
-  exercise: Content,
-  answers: S.array(
-    S.object({
-      text: Text,
-      isCorrect: S.boolean(),
+const MultipleChoiceExercise = schema({
+  kind: 'object',
+  fields: {
+    exercise: Content,
+    answers: schema({
+      kind: 'array',
+      item: schema({
+        kind: 'object',
+        fields: {
+          text: Text,
+          isCorrect: schema({ kind: 'boolean' }),
+        },
+      }),
     }),
-  ),
+  },
 })
 
-const Document = S.array(S.union(Content, MultipleChoiceExercide))
+const Document = schema({
+  kind: 'array',
+  item: schema({
+    kind: 'union',
+    options: [Content, MultipleChoiceExercise],
+  }),
+})
 
-export const Root = S.wrapper({ child: Document, isRoot: true })
+export const Root = schema({ kind: 'wrapper', child: Document, isRoot: true })
