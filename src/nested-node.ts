@@ -13,18 +13,16 @@ export interface NestedNode<S extends Schema> {
   value: JSONValue<S>
 }
 
-type JSONValue<S extends Schema> = [S] extends [unknown] ? _JSONValue<S> : never
-
-type _JSONValue<S extends Schema> = S extends StringSchema
+type JSONValue<S extends Schema> = S extends StringSchema
   ? string
   : S extends BooleanSchema
     ? boolean
     : S extends ArraySchema<infer I>
-      ? _JSONValue<I>[]
+      ? JSONValue<I>[]
       : S extends ObjectSchema
-        ? { [K in keyof S['fields']]: _JSONValue<S['fields'][K]> }
+        ? { [K in keyof S['fields']]: JSONValue<S['fields'][K]> }
         : S extends WrapperSchema<infer C>
-          ? _JSONValue<C>
+          ? JSONValue<C>
           : S extends UnionSchema<infer O>
-            ? _JSONValue<O[number]>
+            ? JSONValue<O[number]>
             : never
