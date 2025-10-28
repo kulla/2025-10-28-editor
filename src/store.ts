@@ -81,6 +81,7 @@ export class EditorStore {
 
   private createNewTransaction(): Transaction {
     return {
+      store: this,
       /*update: (key, updateFn) => {
         const currentValue = this.get(key)
 
@@ -132,4 +133,5 @@ interface Transaction {
   insert(createValue: (key: Key) => FlatNode): Key
   setCursor(cursor: Cursor | null): void
   setCaret(point: Point): void
+  store: EditorStore
 }
