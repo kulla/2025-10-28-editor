@@ -1,11 +1,11 @@
 import type { Key } from '../flat-node'
 import * as N from '../nested-node'
-import type { Schema } from '../schema'
+import type { Root } from '../nodes'
 import type { Transaction } from '../store'
 
 export function attachRoot(args: {
   tx: Transaction
-  node: N.NestedNode<Extract<Schema, { kind: 'wrapper'; isRoot: true }>>
+  node: N.NestedNode<Root>
   rootKey: Key
 }) {
   const { tx, node, rootKey } = args
@@ -14,7 +14,7 @@ export function attachRoot(args: {
     schema: node.schema,
     key: rootKey,
     parentKey: null,
-    value: store({ tx, parentKey: rootKey, node: N.getChild(node) }),
+    value: store({ tx, parentKey: rootKey, node: N.getWrapperChild(node) }),
   })
 }
 
@@ -37,7 +37,7 @@ function store(args: {
       schema: node.schema,
       key,
       parentKey,
-      value: store({ tx, parentKey: key, node: N.getChild(node) }),
+      value: store({ tx, parentKey: key, node: N.getWrapperChild(node) }),
     }))
   } else if (N.isKind('array', node)) {
     return tx.insert((key) => ({
@@ -63,7 +63,7 @@ function store(args: {
       schema: node.schema,
       key,
       parentKey,
-      value: store({ tx, parentKey: key, node: node }),
+      value: store({ tx, parentKey: key, node: N.getUnionOption(node) }),
     }))
   } else {
     throw new Error(`Unsupported schema kind: ${node.schema.kind}`)

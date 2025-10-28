@@ -1,3 +1,5 @@
+import type { JSONValue } from './nested-node'
+
 export function schema<S extends Schema>(schema: S): S {
   return schema
 }
@@ -28,6 +30,7 @@ export interface ArraySchema<I extends Schema = Schema> {
 export interface UnionSchema<O extends Schema[] = Schema[]> {
   kind: 'union'
   options: O
+  getOption(value: JSONValue<O[number]>): O[number]
 }
 
 export interface WrapperSchema<C extends Schema = Schema> {

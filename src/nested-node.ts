@@ -47,11 +47,18 @@ export function getChildren<I extends Schema>(
   }))
 }
 
-export function getChild<C extends Schema>({
+export function getWrapperChild<C extends Schema>({
   schema: { child },
   value,
 }: NestedNode<WrapperSchema<C>>): NestedNode<C> {
   return { schema: child, value: value as JSONValue<C> }
+}
+
+export function getUnionOption<O extends Schema>({
+  schema: { getOption },
+  value,
+}: NestedNode<UnionSchema<O[]>>): NestedNode<O> {
+  return { schema: getOption(value), value }
 }
 
 export function isKind<K extends SchemaKind>(
@@ -61,7 +68,9 @@ export function isKind<K extends SchemaKind>(
   return node.schema.kind === kind
 }
 
-type JSONValue<S extends Schema, D extends number = 5> = [D] extends [never]
+export type JSONValue<S extends Schema, D extends number = 10> = [D] extends [
+  never,
+]
   ? never
   : S extends StringSchema
     ? string
@@ -77,4 +86,4 @@ type JSONValue<S extends Schema, D extends number = 5> = [D] extends [never]
               ? JSONValue<O[number], Prev[D]>
               : never
 
-type Prev = [never, 0, 1, 2, 3, 4, 5]
+type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
