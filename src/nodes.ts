@@ -18,4 +18,4 @@ const MultipleChoiceExercide = S.object({
 
 const Document = S.array(S.union(Content, MultipleChoiceExercide))
 
-const Root = S.wrapper(Document)
+export const Root = S.wrapper(Document)
