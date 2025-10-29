@@ -1,6 +1,7 @@
 import { invariant } from 'es-toolkit'
-import type { FlatNode, Key } from './flat-node'
+import type { FlatNode } from './flat-node'
 import type { Cursor, Point } from './selection'
+import type { Key } from './types'
 
 class PrefixKeyGenerator implements KeyGenerator {
   private counter = 0

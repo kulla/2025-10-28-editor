@@ -33,7 +33,7 @@ const Document = S.array({
   item: S.union({
     options: [Paragraph, MultipleChoiceExercise] as const,
     getOption: (value) =>
-      (typeof 'type') in value ? Paragraph : MultipleChoiceExercise,
+      'type' in value ? Paragraph : MultipleChoiceExercise,
   }),
 })
 

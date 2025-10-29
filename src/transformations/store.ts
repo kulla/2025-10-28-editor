@@ -1,7 +1,7 @@
-import type { Key } from '../flat-node'
 import * as N from '../nested-node'
 import type { Root } from '../nodes'
 import type { Transaction } from '../store'
+import type { Key } from '../types'
 
 export function attachRoot(args: {
   tx: Transaction
@@ -14,7 +14,7 @@ export function attachRoot(args: {
     schema: node.schema,
     key: rootKey,
     parentKey: null,
-    value: store({ tx, parentKey: rootKey, node: N.getWrapperChild(node) }),
+    value: store({ tx, parentKey: rootKey, node: N.getWrappedChild(node) }),
   })
 }
 
@@ -37,7 +37,7 @@ function store(args: {
       schema: node.schema,
       key,
       parentKey,
-      value: store({ tx, parentKey: key, node: N.getWrapperChild(node) }),
+      value: store({ tx, parentKey: key, node: N.getWrappedChild(node) }),
     }))
   } else if (N.isKind('array', node)) {
     return tx.insert((key) => ({

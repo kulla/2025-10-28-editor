@@ -1,10 +1,10 @@
 import type {
+  AllSchema,
   ArraySchema,
-  BooleanSchema,
+  JSONValue,
   ObjectSchema,
   Schema,
   SchemaKind,
-  StringSchema,
   UnionSchema,
   WrapperSchema,
 } from './schema'
@@ -47,11 +47,11 @@ export function getChildren<I extends Schema>(
   }))
 }
 
-export function getWrapperChild<C extends Schema>({
-  schema: { wrapped: child },
+export function getWrappedChild<C extends Schema>({
+  schema: { wrapped, wrapIso },
   value,
 }: NestedNode<WrapperSchema<C>>): NestedNode<C> {
-  return { schema: child, value: value as JSONValue<C> }
+  return { schema: wrapped, value: wrapIso.from(value) }
 }
 
 export function getUnionOption<O extends Schema>({
@@ -64,26 +64,6 @@ export function getUnionOption<O extends Schema>({
 export function isKind<K extends SchemaKind>(
   kind: K,
   node: NestedNode,
-): node is NestedNode<Extract<Schema, { kind: K }>> {
+): node is NestedNode<Extract<AllSchema, { kind: K }>> {
   return node.schema.kind === kind
 }
-
-export type JSONValue<S extends Schema, D extends number = 10> = [D] extends [
-  never,
-]
-  ? never
-  : S extends StringSchema
-    ? string
-    : S extends BooleanSchema
-      ? boolean
-      : S extends ArraySchema<infer I>
-        ? JSONValue<I, Prev[D]>[]
-        : S extends ObjectSchema
-          ? { [K in keyof S['fields']]: JSONValue<S['fields'][K], Prev[D]> }
-          : S extends WrapperSchema<any, any, infer B>
-            ? B
-            : S extends UnionSchema<infer O>
-              ? JSONValue<O[number], Prev[D]>
-              : never
-
-type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

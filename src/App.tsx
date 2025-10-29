@@ -3,17 +3,18 @@ import './App.css'
 import { padStart } from 'es-toolkit/compat'
 import { useEffect } from 'react'
 import { DebugPanel } from './components/debug-panel'
-import type { FlatNode, Key } from './flat-node'
+import type { FlatNode } from './flat-node'
 import { useEditorStore } from './hooks/use-editor-store'
-import type { JSONValue } from './nested-node'
 import { Root } from './nodes'
+import type { JSONValue } from './schema'
 import { attachRoot } from './transformations/store'
+import type { Key } from './types'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [
-  'Hello, world!',
+  { type: 'paragraph', value: 'Hello, world!' },
   {
-    exercise: ['What is the capital of France?'],
+    exercise: [{ type: 'paragraph', value: 'What is the capital of France?' }],
     answers: [
       { text: 'Paris', isCorrect: true },
       { text: 'London', isCorrect: false },

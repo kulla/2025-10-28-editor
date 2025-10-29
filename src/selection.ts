@@ -1,4 +1,4 @@
-import type { Key } from './flat-node'
+import type { Key } from './types'
 
 export interface Cursor<P = Point> {
   start: P
