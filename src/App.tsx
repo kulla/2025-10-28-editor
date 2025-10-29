@@ -1,7 +1,7 @@
 import '@picocss/pico/css/pico.min.css'
 import './App.css'
-import { padStart } from 'es-toolkit/compat'
-import { useEffect } from 'react'
+import { isEqual, padStart } from 'es-toolkit/compat'
+import { useCallback, useEffect } from 'react'
 import { DebugPanel } from './components/debug-panel'
 import type { FlatNode } from './flat-node'
 import { useEditorStore } from './hooks/use-editor-store'
@@ -11,6 +11,7 @@ import { loadJson } from './transformations/load'
 import { render } from './transformations/render'
 import { storeRoot } from './transformations/store'
 import type { Key } from './types'
+import { getCurrentCursor, setSelection } from './selection'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [
@@ -28,6 +29,31 @@ const initialValue: JSONValue<Root> = [
 export default function App() {
   const { store } = useEditorStore()
 
+  const updateCursorFromSelection = useCallback(() => {
+    const cursor = getCurrentCursor()
+
+    if (!isEqual(cursor, store.getCursor())) {
+      store.update((state) => state.setCursor(cursor))
+    }
+  }, [store])
+
+  useEffect(() => {
+    document.addEventListener('selectionchange', updateCursorFromSelection)
+
+    return () => {
+      document.removeEventListener('selectionchange', updateCursorFromSelection)
+    }
+  }, [updateCursorFromSelection])
+
+  useEffect(() => {
+    // Use updateCount here to enforce the effect to run after each store update
+    if (store.updateCount < 0) return
+
+    const cursor = getCurrentCursor()
+
+    if (!isEqual(cursor, store.getCursor())) setSelection(store.getCursor())
+  }, [store, store.updateCount])
+
   useEffect(() => {
     store.update((tx) => {
       if (!store.has(rootKey)) {
@@ -42,10 +68,15 @@ export default function App() {
       {store.has(rootKey) && render({ key: rootKey, store })}
       <DebugPanel
         labels={{
+          cursor: 'Current Cursor',
           json: 'External JSON Value',
           entries: 'Internal Flat Storage',
         }}
         getCurrentValue={{
+          cursor: () => {
+            const cursor = store.getCursor()
+            return JSON.stringify(cursor, null, 2)
+          },
           json: () => {
             if (!store.has(rootKey)) {
               return 'Store is empty'
@@ -66,7 +97,7 @@ export default function App() {
             return lines.join('\n')
           },
         }}
-        showOnStartup={{ entries: true, json: true }}
+        showOnStartup={{ cursor: true, entries: true, json: true }}
       />
     </main>
   )
