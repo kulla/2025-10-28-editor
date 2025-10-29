@@ -1,33 +1,37 @@
 import '@picocss/pico/css/pico.min.css'
 import './App.css'
-import { isEqual, padStart } from 'es-toolkit/compat'
-import { useCallback, useEffect } from 'react'
-import { DebugPanel } from './components/debug-panel'
-import type { FlatNode } from './flat-node'
-import { useEditorStore } from './hooks/use-editor-store'
-import { Root } from './nodes'
-import type { JSONValue } from './schema'
-import { getCurrentCursor, setSelection } from './selection'
-import { loadJson } from './transformations/load'
-import { renderRoot } from './transformations/render'
-import { storeRoot } from './transformations/store'
-import type { Key } from './types'
+import {isEqual, padStart} from 'es-toolkit/compat'
+import {html as beautifyHtml} from 'js-beautify'
+import {useCallback, useEffect} from 'react'
+import {renderToStaticMarkup} from 'react-dom/server'
+import {DebugPanel} from './components/debug-panel'
+import type {FlatNode} from './flat-node'
+import {useEditorStore} from './hooks/use-editor-store'
+import {Root} from './nodes'
+import type {JSONValue} from './schema'
+import {getCurrentCursor, setSelection} from './selection'
+import {loadJson} from './transformations/load'
+import {renderRoot} from './transformations/render'
+import {storeRoot} from './transformations/store'
+import type {Key} from './types'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [
-  { type: 'paragraph', value: 'Hello, world!' },
+  {type: 'paragraph', value: 'Hello, world!'},
   {
-    exercise: [{ type: 'paragraph', value: 'What is the capital of France?' }],
+    exercise: [{type: 'paragraph', value: 'What is the capital of France?'}],
     answers: [
-      { text: 'Paris', isCorrect: true },
-      { text: 'London', isCorrect: false },
-      { text: 'Berlin', isCorrect: false },
+      {text: 'Paris', isCorrect: true},
+      {text: 'London', isCorrect: false},
+      {text: 'Berlin', isCorrect: false},
     ],
   },
 ]
 
 export default function App() {
-  const { store } = useEditorStore()
+  const {store} = useEditorStore()
+  const renderedNode =
+    store.has(rootKey) && renderRoot({node: store.get(rootKey, Root), store})
 
   const updateCursorFromSelection = useCallback(() => {
     const cursor = getCurrentCursor()
@@ -57,7 +61,7 @@ export default function App() {
   useEffect(() => {
     store.update((tx) => {
       if (!store.has(rootKey)) {
-        storeRoot({ tx, node: { schema: Root, value: initialValue }, rootKey })
+        storeRoot({tx, node: {schema: Root, value: initialValue}, rootKey})
       }
     })
   }, [store])
@@ -65,15 +69,21 @@ export default function App() {
   return (
     <main className="p-10">
       <h1>Editor</h1>
-      {store.has(rootKey) &&
-        renderRoot({ node: store.get(rootKey, Root), store })}
+      {renderedNode}
       <DebugPanel
         labels={{
+          html: 'Rendered HTML',
           cursor: 'Current Cursor',
           json: 'External JSON Value',
           entries: 'Internal Flat Storage',
         }}
         getCurrentValue={{
+          html: () => {
+            return beautifyHtml(renderToStaticMarkup(renderedNode), {
+              indent_size: 2,
+              wrap_line_length: 70,
+            })
+          },
           cursor: () => {
             const cursor = store.getCursor()
             return JSON.stringify(cursor, null, 2)
@@ -84,7 +94,7 @@ export default function App() {
             }
 
             const rootNode = store.get(rootKey)
-            const jsonValue = loadJson({ node: rootNode, store })
+            const jsonValue = loadJson({node: rootNode, store})
             return JSON.stringify(jsonValue, null, 2)
           },
           entries: () => {
@@ -98,7 +108,12 @@ export default function App() {
             return lines.join('\n')
           },
         }}
-        showOnStartup={{ cursor: true, entries: true, json: true }}
+        showOnStartup={{
+          html: true,
+          cursor: false,
+          entries: false,
+          json: true,
+        }}
       />
     </main>
   )
