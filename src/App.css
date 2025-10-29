@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+.exercise.multipleChoice {
+  @apply p-4 mb-2 rounded-lg shadow-md bg-gray-100 dark:bg-gray-800 border-0;
+}

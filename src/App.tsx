@@ -8,9 +8,9 @@ import { useEditorStore } from './hooks/use-editor-store'
 import { Root } from './nodes'
 import type { JSONValue } from './schema'
 import { loadJson } from './transformations/load'
+import { render } from './transformations/render'
 import { storeRoot } from './transformations/store'
 import type { Key } from './types'
-import { render } from './transformations/render'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [

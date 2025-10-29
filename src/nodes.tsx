@@ -1,4 +1,5 @@
 import * as S from './schema'
+import { render } from './transformations/render'
 
 const Text = S.string()
 
@@ -8,6 +9,7 @@ const Paragraph = S.wrap({
     to: (s) => ({ type: 'paragraph' as const, value: s }),
     from: (p) => p.value,
   },
+  htmlTag: 'p',
 })
 
 const Content = S.array({ item: Paragraph })
@@ -26,6 +28,24 @@ const MultipleChoiceExercise = S.object({
     }),
   },
   fieldOrder: ['exercise', 'answers'],
+  render({ node, store }) {
+    const key = node.key
+
+    return (
+      <div
+        id={key}
+        key={key}
+        className="exercise multipleChoice"
+        data-key={key}
+      >
+        <div>
+          <strong>Multiple Choice Exercise</strong>
+        </div>
+        <div>{render({ key: node.value.exercise, store })}</div>
+        <div>{render({ key: node.value.answers, store })}</div>
+      </div>
+    )
+  },
 })
 
 // Note: UnionSchema is not implemented in schema.ts, so this part is left as-is

@@ -53,10 +53,12 @@ function store(args: {
       schema: node.schema,
       key,
       parentKey,
-      value: N.mapObjectProperties(node, (propertyNode, propertyKey) => [
-        propertyKey,
-        store({ tx, parentKey: key, node: propertyNode }),
-      ]),
+      value: Object.fromEntries(
+        N.mapObjectProperties(node, (propertyNode, propertyKey) => [
+          propertyKey,
+          store({ tx, parentKey: key, node: propertyNode }),
+        ]),
+      ),
     }))
   } else if (N.isKind('union', node)) {
     return tx.insert((key) => ({

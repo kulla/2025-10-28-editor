@@ -1,9 +1,15 @@
+import type { FlatNode } from './flat-node'
+import type { EditorStore } from './store'
 import type { Iso, Key } from './types'
 
 export function object<F extends Record<string, Schema>>(spec: {
   fields: F
   fieldOrder: Extract<keyof F, string>[]
   htmlTag?: React.HTMLElementType
+  render?(args: {
+    node: FlatNode<ObjectSchema<F>>
+    store: EditorStore
+  }): React.ReactNode
 }): ObjectSchema<F> {
   return { kind: 'object', ...spec, htmlTag: spec.htmlTag ?? 'div' }
 }
@@ -63,7 +69,7 @@ export interface ObjectSchema<
   fieldOrder: Extract<keyof F, string>[]
   htmlTag: React.HTMLElementType
   [TypeInformation]?: {
-    FlatValue: [keyof F, Key][]
+    FlatValue: { [K in keyof F]: Key }
     JSONValue: { [K in keyof F]: JSONValue<F[K]> }
   }
 }
@@ -125,6 +131,7 @@ export interface Schema {
     FlatValue: unknown
     JSONValue: unknown
   }
+  render?(args: { node: FlatNode; store: EditorStore }): React.ReactNode
 }
 
 declare const TypeInformation: unique symbol

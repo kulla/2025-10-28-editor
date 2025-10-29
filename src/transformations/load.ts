@@ -1,6 +1,8 @@
+import { mapValues } from 'es-toolkit'
 import * as F from '../flat-node'
 import type { JSONValue, Schema } from '../schema'
 import type { EditorStore } from '../store'
+import type { Key } from '../types'
 
 export function loadJson<S extends Schema>({
   node,
@@ -22,11 +24,8 @@ export function loadJson<S extends Schema>({
   } else if (F.isKind('union', node)) {
     return loadJson({ node: store.get(node.value), store })
   } else if (F.isKind('object', node)) {
-    return Object.fromEntries(
-      node.value.map(([propertyName, childKey]) => [
-        propertyName,
-        loadJson({ node: store.get(childKey), store }),
-      ]),
+    return mapValues(node.value, (childKey: Key) =>
+      loadJson({ node: store.get(childKey), store }),
     )
   } else {
     throw new Error('Not implemented yet')

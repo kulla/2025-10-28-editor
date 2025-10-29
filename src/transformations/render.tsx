@@ -12,7 +12,9 @@ export function render({
   const node = store.get(key)
   const attributes = { id: key, 'data-key': key }
 
-  if (F.isKind('boolean', node)) {
+  if ('render' in node.schema && typeof node.schema.render === 'function') {
+    return node.schema.render({ node, store })
+  } else if (F.isKind('boolean', node)) {
     return (
       <input
         key={key}
@@ -32,7 +34,9 @@ export function render({
     const HTMLTag = node.schema.htmlTag ?? 'div'
     return (
       <HTMLTag key={key} {...attributes}>
-        {node.value.map(([_, fieldKey]) => render({ key: fieldKey, store }))}
+        {node.schema.fieldOrder.map((property) =>
+          render({ key: node.value[property], store }),
+        )}
       </HTMLTag>
     )
   } else if (F.isKind('array', node)) {
@@ -45,6 +49,7 @@ export function render({
     )
   } else if (F.isKind('union', node) || F.isKind('wrapper', node)) {
     const HTMLTag = node.schema.htmlTag
+
     return HTMLTag !== undefined ? (
       <HTMLTag key={key} {...attributes}>
         {render({ key: node.value, store })}
