@@ -1,5 +1,7 @@
+import clsx from 'clsx'
 import * as S from './schema'
 import { render } from './transformations/render'
+import { pushIndex } from './index-path'
 
 const Text = S.string()
 
@@ -28,21 +30,33 @@ const MultipleChoiceExercise = S.object({
     }),
   },
   fieldOrder: ['exercise', 'answers'],
-  render({ node, store }) {
+  render({ node, store, nodePath, className }) {
     const key = node.key
 
     return (
       <div
         id={key}
         key={key}
-        className="exercise multipleChoice"
+        className={clsx('exercise multipleChoice', className)}
         data-key={key}
       >
         <div>
           <strong>Multiple Choice Exercise</strong>
         </div>
-        <div>{render({ key: node.value.exercise, store })}</div>
-        <div>{render({ key: node.value.answers, store })}</div>
+        <div>
+          {render({
+            key: node.value.exercise,
+            store,
+            nodePath: pushIndex(nodePath, 0),
+          })}
+        </div>
+        <div>
+          {render({
+            key: node.value.answers,
+            store,
+            nodePath: pushIndex(nodePath, 1),
+          })}
+        </div>
       </div>
     )
   },

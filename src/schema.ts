@@ -1,6 +1,7 @@
 import type { FlatNode } from './flat-node'
 import type { EditorStore } from './store'
 import type { Iso, Key } from './types'
+import type { NodePath } from './index-path'
 
 export function object<F extends Record<string, Schema>>(spec: {
   fields: F
@@ -9,6 +10,8 @@ export function object<F extends Record<string, Schema>>(spec: {
   render?(args: {
     node: FlatNode<ObjectSchema<F>>
     store: EditorStore
+    nodePath: NodePath
+    className?: string
   }): React.ReactNode
 }): ObjectSchema<F> {
   return { kind: 'object', ...spec, htmlTag: spec.htmlTag ?? 'div' }
@@ -131,7 +134,12 @@ export interface Schema {
     FlatValue: unknown
     JSONValue: unknown
   }
-  render?(args: { node: FlatNode; store: EditorStore }): React.ReactNode
+  render?(args: {
+    node: FlatNode
+    store: EditorStore
+    nodePath: NodePath
+    className?: string
+  }): React.ReactNode
 }
 
 declare const TypeInformation: unique symbol
