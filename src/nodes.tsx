@@ -1,7 +1,7 @@
 import clsx from 'clsx'
+import { pushIndex } from './index-path'
 import * as S from './schema'
 import { render } from './transformations/render'
-import { pushIndex } from './index-path'
 
 const Text = S.string()
 

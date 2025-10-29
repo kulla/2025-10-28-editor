@@ -1,8 +1,8 @@
 import * as F from '../flat-node'
-import type { Root } from '../nodes'
-import type { EditorStore } from '../store'
-import type { Key } from '../types'
-import { createRootNodePath, pushIndex, type NodePath } from '../index-path'
+import {createRootNodePath, type NodePath, pushIndex} from '../index-path'
+import type {Root} from '../nodes'
+import type {EditorStore} from '../store'
+import type {Key} from '../types'
 
 export function renderRoot({
   node,
@@ -11,7 +11,7 @@ export function renderRoot({
   node: F.FlatNode<Root>
   store: EditorStore
 }): React.ReactNode {
-  const { key } = node
+  const {key} = node
   return (
     <article
       key={key}
@@ -42,10 +42,10 @@ export function render({
   className?: string
 }): React.ReactNode {
   const node = store.get(key)
-  const attributes = { id: key, 'data-key': key }
+  const attributes = {id: key, 'data-key': key}
 
   if ('render' in node.schema && typeof node.schema.render === 'function') {
-    return node.schema.render({ node, store, nodePath, className })
+    return node.schema.render({node, store, nodePath, className})
   } else if (F.isKind('boolean', node)) {
     return (
       <input
@@ -78,11 +78,23 @@ export function render({
   } else if (F.isKind('array', node)) {
     const HTMLTag = node.schema.htmlTag ?? 'div'
 
+    const markRange = getMarkRange(nodePath)
+
     return (
       <HTMLTag key={key} {...attributes} className={className}>
-        {node.value.map((itemKey, index) =>
-          render({ key: itemKey, store, nodePath: pushIndex(nodePath, index) }),
-        )}
+        {node.value.map((itemKey, index) => {
+          const shouldMark =
+            markRange != null &&
+            markRange.start <= index &&
+            markRange.end >= index
+
+          return render({
+            key: itemKey,
+            store,
+            nodePath: pushIndex(nodePath, index),
+            className: shouldMark ? 'selected' : undefined,
+          })
+        })}
       </HTMLTag>
     )
   } else if (F.isKind('union', node) || F.isKind('wrapper', node)) {
@@ -90,12 +102,40 @@ export function render({
 
     return HTMLTag !== undefined ? (
       <HTMLTag key={key} {...attributes} className={className}>
-        {render({ key: node.value, store, nodePath: pushIndex(nodePath, 0) })}
+        {render({key: node.value, store, nodePath: pushIndex(nodePath, 0)})}
       </HTMLTag>
     ) : (
-      render({ key: node.value, store, nodePath: pushIndex(nodePath, 0) })
+      render({key: node.value, store, nodePath: pushIndex(nodePath, 0), className})
     )
   } else {
     throw new Error(`Unknown node kind: ${node.schema.kind}`)
   }
+}
+
+function getMarkRange(
+  nodePath: NodePath,
+): {start: number; end: number} | null {
+  const {cursor, currentNodePath} = nodePath
+  if (cursor == null) return null
+
+  const {start, end} = cursor
+
+  if (
+    start.length < currentNodePath.length + 1 ||
+    end.length < currentNodePath.length + 1
+  ) {
+    return null
+  }
+
+  for (let i = 0; i < currentNodePath.length; i++) {
+    if (start[i] !== currentNodePath[i]) return null
+    if (end[i] !== currentNodePath[i]) return null
+  }
+
+  const startIndex = start[currentNodePath.length]
+  const endIndex = end[currentNodePath.length]
+
+  if (startIndex === endIndex) return null
+
+  return {start: startIndex, end: endIndex}
 }

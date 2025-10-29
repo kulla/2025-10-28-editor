@@ -5,6 +5,10 @@ article {
   caret-color: transparent;
 }
 
+.selected {
+  @apply outline-solid outline-2 outline-blue-500 rounded;
+}
+
 span[data-type="text"] {
   caret-color: auto;
 }

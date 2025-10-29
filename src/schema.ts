@@ -1,7 +1,7 @@
 import type { FlatNode } from './flat-node'
+import type { NodePath } from './index-path'
 import type { EditorStore } from './store'
 import type { Iso, Key } from './types'
-import type { NodePath } from './index-path'
 
 export function object<F extends Record<string, Schema>>(spec: {
   fields: F
