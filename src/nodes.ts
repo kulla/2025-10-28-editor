@@ -1,29 +1,24 @@
-import { schema } from './schema'
-import { Iso } from './utils/types'
+import * as S from './schema'
 
-const Text = schema({ kind: 'string' })
+const Text = S.string()
 
-const Paragraph = schema({
-  kind: 'wrapper',
-  child: Text,
-  wrapChild: {
-    to: (s: string) => ({ type: 'paragraph' as const, value: s }),
-    from: (p: { type: 'paragraph'; value: string }) => p.value,
-  } as Iso<string, { type: 'paragraph'; value: string }>,
+const Paragraph = S.wrap({
+  wrapped: Text,
+  wrapIso: {
+    to: (s) => ({ type: 'paragraph' as const, value: s }),
+    from: (p) => p.value,
+  },
 })
 
-const Content = schema({ kind: 'array', item: Paragraph })
+const Content = S.array({ item: Paragraph })
 
-const MultipleChoiceExercise = schema({
-  kind: 'object',
+const MultipleChoiceExercise = S.object({
   fields: {
     exercise: Content,
-    answers: schema({
-      kind: 'array',
-      item: schema({
-        kind: 'object',
+    answers: S.array({
+      item: S.object({
         fields: {
-          isCorrect: schema({ kind: 'boolean' }),
+          isCorrect: S.boolean(),
           text: Text,
         },
         fieldOrder: ['isCorrect', 'text'],
@@ -33,19 +28,17 @@ const MultipleChoiceExercise = schema({
   fieldOrder: ['exercise', 'answers'],
 })
 
-const Document = schema({
-  kind: 'array',
-  item: schema({
-    kind: 'union',
-    options: [Paragraph, MultipleChoiceExercise],
+// Note: UnionSchema is not implemented in schema.ts, so this part is left as-is
+const Document = S.array({
+  item: S.union({
+    options: [Paragraph, MultipleChoiceExercise] as const,
     getOption: (value) =>
-      typeof value === 'string' ? Paragraph : MultipleChoiceExercise,
+      (typeof 'type') in value ? Paragraph : MultipleChoiceExercise,
   }),
 })
 
 export type Root = typeof Root
-export const Root = schema({
-  kind: 'wrapper',
-  child: Document,
-  wrapChild: { to: (s) => s, from: (s) => s },
+export const Root = S.wrap({
+  wrapped: Document,
+  wrapIso: { to: (s) => s, from: (s) => s },
 })

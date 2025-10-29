@@ -1,3 +1,5 @@
+export type Key = Branded<string, 'Key'>
+
 declare const brand: unique symbol
 export type Branded<T, B> = T & { [brand]: B }
 

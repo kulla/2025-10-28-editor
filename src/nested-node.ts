@@ -48,7 +48,7 @@ export function getChildren<I extends Schema>(
 }
 
 export function getWrapperChild<C extends Schema>({
-  schema: { child },
+  schema: { wrapped: child },
   value,
 }: NestedNode<WrapperSchema<C>>): NestedNode<C> {
   return { schema: child, value: value as JSONValue<C> }

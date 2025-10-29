@@ -1,53 +1,114 @@
-import type { JSONValue } from './nested-node'
-import type { Iso } from './utils/types'
+import type { Iso, Key } from './utils/types'
 
-export function schema<S extends Schema>(schema: S): S {
-  return schema
+export function object<F extends Record<string, BaseSchema>>(spec: {
+  fields: F
+  fieldOrder: Extract<keyof F, string>[]
+}): ObjectSchema<F> {
+  return { kind: 'object', ...spec }
 }
 
-export type Schema =
-  | ObjectSchema
-  | ArraySchema
-  | StringSchema
-  | BooleanSchema
-  | WrapperSchema
-  | UnionSchema
+export function union<OptionSchema extends BaseSchema[]>(spec: {
+  options: OptionSchema
+  getOption(value: JSONValue<OptionSchema[number]>): OptionSchema[number]
+}): UnionSchema<OptionSchema> {
+  return { kind: 'union', ...spec }
+}
 
-export type SchemaKind = Schema['kind']
+export function array<ItemSchema extends BaseSchema>(spec: {
+  item: ItemSchema
+}): ArraySchema<ItemSchema> {
+  return { kind: 'array', ...spec }
+}
+
+export function wrap<C extends BaseSchema, B>(spec: {
+  wrapped: C
+  wrapIso: Iso<JSONValue<C>, B>
+}): WrapperSchema<C, B> {
+  return { kind: 'wrapper', ...spec }
+}
+
+export function string(): StringSchema {
+  return { kind: 'string' }
+}
+
+export function boolean(): BooleanSchema {
+  return { kind: 'boolean' }
+}
+
+export type FlatValue<S extends BaseSchema> = NonNullable<
+  S[typeof TypeInformation]
+>['FlatValue']
+export type JSONValue<S extends BaseSchema> = NonNullable<
+  S[typeof TypeInformation]
+>['JSONValue']
 
 export interface ObjectSchema<
-  F extends Record<string, Schema> = Record<string, Schema>,
-> {
+  F extends Record<string, BaseSchema> = Record<string, BaseSchema>,
+> extends BaseSchema {
   kind: 'object'
   fields: F
   fieldOrder: Extract<keyof F, string>[]
+  [TypeInformation]?: {
+    FlatValue: { [K in keyof F]: Key }
+    JSONValue: { [K in keyof F]: JSONValue<F[K]> }
+  }
 }
 
-export interface ArraySchema<I extends Schema = Schema> {
+export interface ArraySchema<ItemSchema extends BaseSchema = BaseSchema>
+  extends BaseSchema {
   kind: 'array'
-  item: I
+  item: ItemSchema
+  [TypeInformation]?: {
+    FlatValue: Key[]
+    JSONValue: JSONValue<ItemSchema>[]
+  }
 }
 
-export interface UnionSchema<O extends Schema[] = Schema[]> {
+export interface UnionSchema<OptionSchema extends BaseSchema[] = BaseSchema[]>
+  extends BaseSchema {
   kind: 'union'
-  options: O
-  getOption(value: JSONValue<O[number]>): O[number]
+  options: OptionSchema
+  getOption(value: JSONValue<OptionSchema[number]>): OptionSchema[number]
+  [TypeInformation]?: {
+    FlatValue: Key
+    JSONValue: JSONValue<OptionSchema[number]>
+  }
 }
 
 export interface WrapperSchema<
-  C extends Schema = Schema,
-  A extends JSONValue<C> = JSONValue<C>,
-  B = unknown,
-> {
+  C extends BaseSchema = BaseSchema,
+  B = JSONValue<C>,
+> extends BaseSchema {
   kind: 'wrapper'
-  child: C
-  wrapChild: Iso<A, B>
+  wrapped: C
+  wrapIso: Iso<JSONValue<C>, B>
+  [TypeInformation]?: {
+    FlatValue: Key
+    JSONValue: B
+  }
 }
 
-export interface StringSchema {
+export interface StringSchema extends BaseSchema {
   kind: 'string'
+  [TypeInformation]?: {
+    FlatValue: string
+    JSONValue: string
+  }
 }
 
-export interface BooleanSchema {
+export interface BooleanSchema extends BaseSchema {
   kind: 'boolean'
+  [TypeInformation]?: {
+    FlatValue: boolean
+    JSONValue: boolean
+  }
 }
+
+interface BaseSchema {
+  [TypeInformation]?: {
+    FlatValue: unknown
+    JSONValue: unknown
+  }
+}
+
+declare const TypeInformation: unique symbol
