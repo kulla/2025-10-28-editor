@@ -7,11 +7,11 @@ import type { FlatNode } from './flat-node'
 import { useEditorStore } from './hooks/use-editor-store'
 import { Root } from './nodes'
 import type { JSONValue } from './schema'
+import { getCurrentCursor, setSelection } from './selection'
 import { loadJson } from './transformations/load'
-import { render } from './transformations/render'
+import { renderRoot } from './transformations/render'
 import { storeRoot } from './transformations/store'
 import type { Key } from './types'
-import { getCurrentCursor, setSelection } from './selection'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [
@@ -65,7 +65,8 @@ export default function App() {
   return (
     <main className="p-10">
       <h1>Editor</h1>
-      {store.has(rootKey) && render({ key: rootKey, store })}
+      {store.has(rootKey) &&
+        renderRoot({ node: store.get(rootKey, Root), store })}
       <DebugPanel
         labels={{
           cursor: 'Current Cursor',

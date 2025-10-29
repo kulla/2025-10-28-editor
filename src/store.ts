@@ -1,5 +1,6 @@
 import { invariant } from 'es-toolkit'
 import type { FlatNode } from './flat-node'
+import type { Schema } from './schema'
 import type { Cursor, Point } from './selection'
 import type { Key } from './types'
 
@@ -29,12 +30,12 @@ export class EditorStore {
     return this.cursor
   }
 
-  get(key: Key) {
+  get<S extends Schema>(key: Key, _schema?: S): FlatNode<S> {
     const node = this.nodes.get(key)
 
     invariant(node != null, `Value for key ${key} not found`)
 
-    return node
+    return node as FlatNode<S>
   }
 
   has(key: Key): boolean {

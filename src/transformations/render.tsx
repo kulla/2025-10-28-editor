@@ -1,6 +1,29 @@
 import * as F from '../flat-node'
+import type { Root } from '../nodes'
 import type { EditorStore } from '../store'
 import type { Key } from '../types'
+
+export function renderRoot({
+  node,
+  store,
+}: {
+  node: F.FlatNode<Root>
+  store: EditorStore
+}): React.ReactNode {
+  const { key } = node
+  return (
+    <article
+      key={key}
+      id={key}
+      data-key={key}
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+    >
+      {render({ key: node.value, store })}
+    </article>
+  )
+}
 
 export function render({
   key,
