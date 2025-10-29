@@ -7,9 +7,10 @@ import type { FlatNode } from './flat-node'
 import { useEditorStore } from './hooks/use-editor-store'
 import { Root } from './nodes'
 import type { JSONValue } from './schema'
+import { loadJson } from './transformations/load'
 import { storeRoot } from './transformations/store'
 import type { Key } from './types'
-import { loadJson } from './transformations/load'
+import { render } from './transformations/render'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [
@@ -38,6 +39,7 @@ export default function App() {
   return (
     <main className="p-10">
       <h1>Editor</h1>
+      {store.has(rootKey) && render({ key: rootKey, store })}
       <DebugPanel
         labels={{
           json: 'External JSON Value',
