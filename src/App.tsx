@@ -9,6 +9,7 @@ import { Root } from './nodes'
 import type { JSONValue } from './schema'
 import { storeRoot } from './transformations/store'
 import type { Key } from './types'
+import { loadJson } from './transformations/load'
 
 const rootKey = 'root' as Key
 const initialValue: JSONValue<Root> = [
@@ -38,8 +39,20 @@ export default function App() {
     <main className="p-10">
       <h1>Editor</h1>
       <DebugPanel
-        labels={{ entries: 'Internal Storage' }}
+        labels={{
+          json: 'External JSON Value',
+          entries: 'Internal Flat Storage',
+        }}
         getCurrentValue={{
+          json: () => {
+            if (!store.has(rootKey)) {
+              return 'Store is empty'
+            }
+
+            const rootNode = store.get(rootKey)
+            const jsonValue = loadJson({ node: rootNode, store })
+            return JSON.stringify(jsonValue, null, 2)
+          },
           entries: () => {
             const stringifyEntry = ([key, entry]: [string, FlatNode]) =>
               `${padStart(key, 4)}: ${JSON.stringify(entry.value)}`
@@ -51,7 +64,7 @@ export default function App() {
             return lines.join('\n')
           },
         }}
-        showOnStartup={{ entries: true }}
+        showOnStartup={{ entries: true, json: true }}
       />
     </main>
   )

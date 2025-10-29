@@ -58,7 +58,7 @@ export interface ObjectSchema<
   fields: F
   fieldOrder: Extract<keyof F, string>[]
   [TypeInformation]?: {
-    FlatValue: { [K in keyof F]: Key }
+    FlatValue: [keyof F, Key][]
     JSONValue: { [K in keyof F]: JSONValue<F[K]> }
   }
 }

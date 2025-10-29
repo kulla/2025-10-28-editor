@@ -14,6 +14,13 @@ export interface NestedNode<S extends Schema = Schema> {
   value: JSONValue<S>
 }
 
+export function create<S extends Schema>(
+  schema: S,
+  value: JSONValue<S>,
+): NestedNode<S> {
+  return { schema, value }
+}
+
 export function getProperty<
   F extends Record<string, Schema>,
   K extends keyof F,
