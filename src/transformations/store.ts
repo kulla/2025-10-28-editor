@@ -3,7 +3,7 @@ import type { Root } from '../nodes'
 import type { Transaction } from '../store'
 import type { Key } from '../types'
 
-export function attachRoot(args: {
+export function storeRoot(args: {
   tx: Transaction
   node: N.NestedNode<Root>
   rootKey: Key

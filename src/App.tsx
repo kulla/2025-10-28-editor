@@ -7,7 +7,7 @@ import type { FlatNode } from './flat-node'
 import { useEditorStore } from './hooks/use-editor-store'
 import { Root } from './nodes'
 import type { JSONValue } from './schema'
-import { attachRoot } from './transformations/store'
+import { storeRoot } from './transformations/store'
 import type { Key } from './types'
 
 const rootKey = 'root' as Key
@@ -29,7 +29,7 @@ export default function App() {
   useEffect(() => {
     store.update((tx) => {
       if (!store.has(rootKey)) {
-        attachRoot({ tx, node: { schema: Root, value: initialValue }, rootKey })
+        storeRoot({ tx, node: { schema: Root, value: initialValue }, rootKey })
       }
     })
   }, [store])
