@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+article {
+  caret-color: transparent;
+}
+
+span[data-type="text"] {
+  caret-color: auto;
+}
+
 .exercise.multipleChoice {
   @apply p-4 mb-2 rounded-lg shadow-md bg-gray-100 dark:bg-gray-800 border-0;
 }
