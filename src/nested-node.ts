@@ -80,8 +80,8 @@ export type JSONValue<S extends Schema, D extends number = 10> = [D] extends [
         ? JSONValue<I, Prev[D]>[]
         : S extends ObjectSchema
           ? { [K in keyof S['fields']]: JSONValue<S['fields'][K], Prev[D]> }
-          : S extends WrapperSchema
-            ? JSONValue<S['child'], Prev[D]>
+          : S extends WrapperSchema<any, any, infer B>
+            ? B
             : S extends UnionSchema<infer O>
               ? JSONValue<O[number], Prev[D]>
               : never

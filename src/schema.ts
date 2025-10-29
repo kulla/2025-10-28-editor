@@ -1,4 +1,5 @@
 import type { JSONValue } from './nested-node'
+import type { Iso } from './utils/types'
 
 export function schema<S extends Schema>(schema: S): S {
   return schema
@@ -33,9 +34,14 @@ export interface UnionSchema<O extends Schema[] = Schema[]> {
   getOption(value: JSONValue<O[number]>): O[number]
 }
 
-export interface WrapperSchema<C extends Schema = Schema> {
+export interface WrapperSchema<
+  C extends Schema = Schema,
+  A extends JSONValue<C> = JSONValue<C>,
+  B = unknown,
+> {
   kind: 'wrapper'
   child: C
+  wrapChild: Iso<A, B>
 }
 
 export interface StringSchema {

@@ -1,8 +1,16 @@
 import { schema } from './schema'
+import { Iso } from './utils/types'
 
 const Text = schema({ kind: 'string' })
 
-const Paragraph = schema({ kind: 'wrapper', child: Text })
+const Paragraph = schema({
+  kind: 'wrapper',
+  child: Text,
+  wrapChild: {
+    to: (s: string) => ({ type: 'paragraph' as const, value: s }),
+    from: (p: { type: 'paragraph'; value: string }) => p.value,
+  } as Iso<string, { type: 'paragraph'; value: string }>,
+})
 
 const Content = schema({ kind: 'array', item: Paragraph })
 
@@ -36,4 +44,8 @@ const Document = schema({
 })
 
 export type Root = typeof Root
-export const Root = schema({ kind: 'wrapper', child: Document })
+export const Root = schema({
+  kind: 'wrapper',
+  child: Document,
+  wrapChild: { to: (s) => s, from: (s) => s },
+})
