@@ -1,17 +1,19 @@
 import * as F from '../flat-node'
-import {createRootNodePath, type NodePath, pushIndex} from '../index-path'
-import type {Root} from '../nodes'
-import type {EditorStore} from '../store'
-import type {Key} from '../types'
+import { createRootNodePath, type NodePath, pushIndex } from '../index-path'
+import type { Root } from '../nodes'
+import type { EditorStore } from '../store'
+import type { Key } from '../types'
 
 export function renderRoot({
   node,
   store,
+  onKeyDown,
 }: {
   node: F.FlatNode<Root>
   store: EditorStore
+  onKeyDown: React.KeyboardEventHandler
 }): React.ReactNode {
-  const {key} = node
+  const { key } = node
   return (
     <article
       key={key}
@@ -20,6 +22,8 @@ export function renderRoot({
       contentEditable
       suppressContentEditableWarning
       spellCheck={false}
+      onKeyDown={onKeyDown}
+      onBeforeInput={() => {}}
     >
       {render({
         key: node.value,
@@ -42,10 +46,10 @@ export function render({
   className?: string
 }): React.ReactNode {
   const node = store.get(key)
-  const attributes = {id: key, 'data-key': key}
+  const attributes = { id: key, 'data-key': key }
 
   if ('render' in node.schema && typeof node.schema.render === 'function') {
-    return node.schema.render({node, store, nodePath, className})
+    return node.schema.render({ node, store, nodePath, className })
   } else if (F.isKind('boolean', node)) {
     return (
       <input
@@ -102,10 +106,15 @@ export function render({
 
     return HTMLTag !== undefined ? (
       <HTMLTag key={key} {...attributes} className={className}>
-        {render({key: node.value, store, nodePath: pushIndex(nodePath, 0)})}
+        {render({ key: node.value, store, nodePath: pushIndex(nodePath, 0) })}
       </HTMLTag>
     ) : (
-      render({key: node.value, store, nodePath: pushIndex(nodePath, 0), className})
+      render({
+        key: node.value,
+        store,
+        nodePath: pushIndex(nodePath, 0),
+        className,
+      })
     )
   } else {
     throw new Error(`Unknown node kind: ${node.schema.kind}`)
@@ -114,11 +123,11 @@ export function render({
 
 function getMarkRange(
   nodePath: NodePath,
-): {start: number; end: number} | null {
-  const {cursor, currentNodePath} = nodePath
+): { start: number; end: number } | null {
+  const { cursor, currentNodePath } = nodePath
   if (cursor == null) return null
 
-  const {start, end} = cursor
+  const { start, end } = cursor
 
   if (
     start.length < currentNodePath.length + 1 ||
@@ -137,5 +146,5 @@ function getMarkRange(
 
   if (startIndex === endIndex) return null
 
-  return {start: startIndex, end: endIndex}
+  return { start: startIndex, end: endIndex }
 }
