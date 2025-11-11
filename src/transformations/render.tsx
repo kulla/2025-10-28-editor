@@ -89,7 +89,8 @@ export function render({
     const markRange =
       nodePos != null &&
       nodePos.left.type === EdgeRelationType.Inside &&
-      nodePos.right.type === EdgeRelationType.Inside
+      nodePos.right.type === EdgeRelationType.Inside &&
+      nodePos.left.path[0] !== nodePos.right.path[0]
         ? { start: nodePos.left.path[0], end: nodePos.right.path[0] }
         : null
 
