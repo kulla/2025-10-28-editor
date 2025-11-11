@@ -44,7 +44,7 @@ export function getPoint(
 }
 
 export function isCollapsed<P>(cursor: Cursor<P>): boolean {
-  return cursor != null && !isEqual(cursor.left, cursor.right)
+  return isEqual(cursor.left, cursor.right)
 }
 
 export function setSelection(cursor: Cursor | null) {
