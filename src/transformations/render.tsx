@@ -33,7 +33,7 @@ export function renderRoot({
       onKeyDown={onKeyDown}
       onBeforeInput={() => {}}
     >
-      {render({ key: node.value, store, nodePos: childPos })}
+      {render({ key: node.value, store, pos: childPos })}
     </article>
   )
 }
@@ -41,19 +41,19 @@ export function renderRoot({
 export function render({
   key,
   store,
-  nodePos,
+  pos,
   className,
 }: {
   key: Key
   store: EditorStore
-  nodePos: NodeRangePosition
+  pos: NodeRangePosition | null
   className?: string
 }): React.ReactNode {
   const node = store.get(key)
   const attributes = { id: key, 'data-key': key }
 
   if ('render' in node.schema && typeof node.schema.render === 'function') {
-    return node.schema.render({ node, store, nodePath: nodePos, className })
+    return node.schema.render({ node, store, pos, className })
   } else if (F.isKind('boolean', node)) {
     return (
       <input
@@ -80,7 +80,7 @@ export function render({
           render({
             key: node.value[property],
             store,
-            nodePos: pushIndex(nodePos, index),
+            pos: pushIndex(pos, index),
           }),
         )}
       </HTMLTag>
@@ -89,11 +89,11 @@ export function render({
     const HTMLTag = node.schema.htmlTag ?? 'div'
 
     const markRange =
-      nodePos != null &&
-      nodePos.left.type === EdgeRelationType.Inside &&
-      nodePos.right.type === EdgeRelationType.Inside &&
-      nodePos.left.path[0] !== nodePos.right.path[0]
-        ? { start: nodePos.left.path[0], end: nodePos.right.path[0] }
+      pos != null &&
+      pos.left.type === EdgeRelationType.Inside &&
+      pos.right.type === EdgeRelationType.Inside &&
+      pos.left.path[0] !== pos.right.path[0]
+        ? { start: pos.left.path[0], end: pos.right.path[0] }
         : null
 
     return (
@@ -107,7 +107,7 @@ export function render({
           return render({
             key: itemKey,
             store,
-            nodePos: pushIndex(nodePos, index),
+            pos: pushIndex(pos, index),
             className: shouldMark ? 'selected' : undefined,
           })
         })}
@@ -118,13 +118,13 @@ export function render({
 
     return HTMLTag !== undefined ? (
       <HTMLTag key={key} {...attributes} className={className}>
-        {render({ key: node.value, store, nodePos: pushIndex(nodePos, 0) })}
+        {render({ key: node.value, store, pos: pushIndex(pos, 0) })}
       </HTMLTag>
     ) : (
       render({
         key: node.value,
         store,
-        nodePos: pushIndex(nodePos, 0),
+        pos: pushIndex(pos, 0),
         className,
       })
     )

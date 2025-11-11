@@ -10,7 +10,7 @@ export function object<F extends Record<string, Schema>>(spec: {
   render?(args: {
     node: FlatNode<ObjectSchema<F>>
     store: EditorStore
-    nodePath: NodeRangePosition
+    pos: NodeRangePosition | null
     className?: string
   }): React.ReactNode
 }): ObjectSchema<F> {
@@ -137,7 +137,7 @@ export interface Schema {
   render?(args: {
     node: FlatNode
     store: EditorStore
-    nodePath: NodeRangePosition
+    pos: NodeRangePosition | null
     className?: string
   }): React.ReactNode
 }

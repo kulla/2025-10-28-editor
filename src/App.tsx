@@ -9,8 +9,13 @@ import type { FlatNode } from './flat-node'
 import { useEditorStore } from './hooks/use-editor-store'
 import { Root } from './nodes'
 import type { JSONValue } from './schema'
-import { getCurrentCursor, setSelection } from './selection'
+import { getCurrentCursor, isCollapsed, setSelection } from './selection'
 import { dispatch } from './transformations/command'
+import {
+  deleteBackward,
+  deleteForward,
+  deleteRange,
+} from './transformations/delete'
 import { insertText } from './transformations/insert-text'
 import { loadJson } from './transformations/load'
 import { renderRoot } from './transformations/render'
@@ -35,14 +40,26 @@ export default function App() {
 
   const onKeyDown: React.KeyboardEventHandler = useCallback(
     (event) => {
+      const cursor = store.getCursor()
+
+      if (cursor == null) return
+
       if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
         dispatch({ command: insertText, store, payload: { text: event.key } })
       } else if (event.key === 'Enter') {
         // manager.dispatchCommand(Command.InsertNewElement)
       } else if (event.key === 'Backspace') {
-        //dispatchCommand(store, Command.DeleteBackward)
+        if (isCollapsed(cursor)) {
+          dispatch({ command: deleteBackward, store, payload: {} })
+        } else {
+          dispatch({ command: deleteRange, store, payload: {} })
+        }
       } else if (event.key === 'Delete') {
-        // dispatchCommand(store, Command.DeleteForward)
+        if (isCollapsed(cursor)) {
+          dispatch({ command: deleteForward, store, payload: {} })
+        } else {
+          dispatch({ command: deleteRange, store, payload: {} })
+        }
       }
 
       if (

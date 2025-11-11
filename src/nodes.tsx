@@ -30,7 +30,7 @@ const MultipleChoiceExercise = S.object({
     }),
   },
   fieldOrder: ['exercise', 'answers'],
-  render({ node, store, nodePath, className }) {
+  render({ node, store, pos, className }) {
     const key = node.key
 
     return (
@@ -44,18 +44,10 @@ const MultipleChoiceExercise = S.object({
           <strong>Multiple Choice Exercise</strong>
         </div>
         <div>
-          {render({
-            key: node.value.exercise,
-            store,
-            nodePos: pushIndex(nodePath, 0),
-          })}
+          {render({ key: node.value.exercise, store, pos: pushIndex(pos, 0) })}
         </div>
         <div>
-          {render({
-            key: node.value.answers,
-            store,
-            nodePos: pushIndex(nodePath, 1),
-          })}
+          {render({ key: node.value.answers, store, pos: pushIndex(pos, 1) })}
         </div>
       </div>
     )

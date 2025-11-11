@@ -16,12 +16,12 @@ type EdgeRelationToNode =
   | { type: EdgeRelationType.Inside; path: NonEmptyArray<number> }
   | { type: EdgeRelationType.AfterThisNode }
 
-export type NodeRangePosition = Cursor<EdgeRelationToNode> | null
+export type NodeRangePosition = Cursor<EdgeRelationToNode>
 
 export function pushIndex(
-  path: NodeRangePosition,
+  path: NodeRangePosition | null,
   index: number,
-): NodeRangePosition {
+): NodeRangePosition | null {
   if (path == null) return null
 
   return {
@@ -59,7 +59,9 @@ function pushEdgeIndex(
   }
 }
 
-export function getRootRangePosition(store: EditorStore): NodeRangePosition {
+export function getRootRangePosition(
+  store: EditorStore,
+): NodeRangePosition | null {
   const cursor = store.getCursor()
 
   if (cursor == null) return null

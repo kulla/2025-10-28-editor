@@ -10,7 +10,6 @@ export const insertText: Command<{ text: string }> = ({
   pos,
 }) => {
   if (!F.isKind('string', node)) return { type: CommandResultType.Failure }
-  if (pos == null) return { type: CommandResultType.Failure }
   if (!isCollapsed(pos)) return { type: CommandResultType.Failure }
   if (pos.left.type !== EdgeRelationType.Inside)
     return { type: CommandResultType.Failure }
