@@ -127,7 +127,7 @@ function getMarkRange(
   const { cursor, currentNodePath } = nodePath
   if (cursor == null) return null
 
-  const { start, end } = cursor
+  const { left: start, right: end } = cursor
 
   if (
     start.length < currentNodePath.length + 1 ||

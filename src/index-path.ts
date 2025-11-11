@@ -1,7 +1,7 @@
 import * as F from './flat-node'
-import type {Cursor} from './selection'
-import type {EditorStore} from './store'
-import type {Key} from './types'
+import type { Cursor } from './selection'
+import type { EditorStore } from './store'
+import type { Key } from './types'
 
 export interface NodePath {
   cursor: Cursor<IndexPath> | null
@@ -23,15 +23,15 @@ export function createRootNodePath(store: EditorStore): NodePath {
       cursor == null
         ? null
         : {
-          start: getIndexPath({
-            node: store.get(cursor.start.key),
-            store,
-          }),
-          end: getIndexPath({
-            node: store.get(cursor.end.key),
-            store,
-          }),
-        },
+            left: getIndexPath({
+              node: store.get(cursor.left.key),
+              store,
+            }),
+            right: getIndexPath({
+              node: store.get(cursor.right.key),
+              store,
+            }),
+          },
     currentNodePath: [0],
   }
 }

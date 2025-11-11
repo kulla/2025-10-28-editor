@@ -1,8 +1,8 @@
 import { isKey, type Key } from './types'
 
 export interface Cursor<P = Point> {
-  start: P
-  end: P
+  left: P
+  right: P
 }
 
 export interface Point {
@@ -22,7 +22,7 @@ export function getCurrentCursor(): Cursor | null {
 
   if (startPoint == null || endPoint == null) return null
 
-  return { start: startPoint, end: endPoint }
+  return { left: startPoint, right: endPoint }
 }
 
 export function getPoint(
@@ -43,7 +43,7 @@ export function getPoint(
 }
 
 export function isCollapsed(cursor: Cursor): boolean {
-  const { start, end } = cursor
+  const { left: start, right: end } = cursor
   return start.key === end.key && start.offset === end.offset
 }
 
@@ -53,7 +53,7 @@ export function setSelection(cursor: Cursor | null) {
     return
   }
 
-  const { start, end } = cursor
+  const { left: start, right: end } = cursor
 
   const selection = window.getSelection()
   if (selection == null) return

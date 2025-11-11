@@ -116,7 +116,7 @@ export class EditorStore {
         this.cursor = cursor
       },
       setCaret(point) {
-        this.setCursor({ start: point, end: point })
+        this.setCursor({ left: point, right: point })
       },
     }
   }
