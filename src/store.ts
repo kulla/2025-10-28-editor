@@ -1,6 +1,6 @@
 import { invariant } from 'es-toolkit'
 import type { FlatNode } from './flat-node'
-import type { Schema } from './schema'
+import type { FlatValue, Schema } from './schema'
 import type { Cursor, Point } from './selection'
 import type { Key } from './types'
 
@@ -84,16 +84,13 @@ export class EditorStore {
   private createNewTransaction(): Transaction {
     return {
       store: this,
-      /*update: (key, updateFn) => {
-        const currentValue = this.get(key)
+      update: ({ key, schema }, updateFn) => {
+        const currentValue = this.get(key, schema)
 
-        const newValue =
-          typeof updateFn === 'function'
-            ? updateFn(currentValue.value)
-            : updateFn
+        const newValue = updateFn(currentValue.value)
 
         this.nodes.set(key, { ...currentValue, value: newValue })
-      },*/
+      },
       attachRoot: (rootKey, value) => {
         invariant(
           !this.has(rootKey),
@@ -127,10 +124,10 @@ export class EditorStore {
 }
 
 export interface Transaction {
-  /*update<S extends Schema>(
-    key: Key,
-    updateFn: ((current: FlatValue<S>) => FlatValue<S>) | FlatValue<S>,
-  ): void*/
+  update<S extends Schema>(
+    node: FlatNode<S>,
+    updateFn: (current: FlatValue<S>) => FlatValue<S>,
+  ): void
   attachRoot(rootKey: Key, value: FlatNode): void
   insert(createValue: (key: Key) => FlatNode): Key
   setCursor(cursor: Cursor | null): void

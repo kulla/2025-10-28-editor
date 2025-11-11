@@ -10,6 +10,8 @@ import { useEditorStore } from './hooks/use-editor-store'
 import { Root } from './nodes'
 import type { JSONValue } from './schema'
 import { getCurrentCursor, setSelection } from './selection'
+import { dispatch } from './transformations/command'
+import { insertText } from './transformations/insert-text'
 import { loadJson } from './transformations/load'
 import { renderRoot } from './transformations/render'
 import { storeRoot } from './transformations/store'
@@ -31,25 +33,28 @@ const initialValue: JSONValue<Root> = [
 export default function App() {
   const { store } = useEditorStore()
 
-  const onKeyDown: React.KeyboardEventHandler = useCallback((event) => {
-    if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
-      // dispatchCommand(store, Command.InsertText, event.key)
-    } else if (event.key === 'Enter') {
-      // manager.dispatchCommand(Command.InsertNewElement)
-    } else if (event.key === 'Backspace') {
-      //dispatchCommand(store, Command.DeleteBackward)
-    } else if (event.key === 'Delete') {
-      // dispatchCommand(store, Command.DeleteForward)
-    }
+  const onKeyDown: React.KeyboardEventHandler = useCallback(
+    (event) => {
+      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
+        dispatch({ command: insertText, store, payload: { text: event.key } })
+      } else if (event.key === 'Enter') {
+        // manager.dispatchCommand(Command.InsertNewElement)
+      } else if (event.key === 'Backspace') {
+        //dispatchCommand(store, Command.DeleteBackward)
+      } else if (event.key === 'Delete') {
+        // dispatchCommand(store, Command.DeleteForward)
+      }
 
-    if (
-      (event.ctrlKey && ['c', 'v', 'x'].includes(event.key.toLowerCase())) ||
-      ['Enter', 'Tab', 'Delete', 'Backspace'].includes(event.key) ||
-      (event.key.length === 1 && !event.ctrlKey && !event.metaKey)
-    ) {
-      event.preventDefault()
-    }
-  }, [])
+      if (
+        (event.ctrlKey && ['c', 'v', 'x'].includes(event.key.toLowerCase())) ||
+        ['Enter', 'Tab', 'Delete', 'Backspace'].includes(event.key) ||
+        (event.key.length === 1 && !event.ctrlKey && !event.metaKey)
+      ) {
+        event.preventDefault()
+      }
+    },
+    [store],
+  )
 
   const renderedNode =
     store.has(rootKey) &&

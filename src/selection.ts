@@ -1,3 +1,4 @@
+import { isEqual } from 'es-toolkit'
 import { isKey, type Key } from './types'
 
 export interface Cursor<P = Point> {
@@ -42,9 +43,8 @@ export function getPoint(
   return type === 'text' && offset != null ? { key, offset } : { key }
 }
 
-export function isCollapsed(cursor: Cursor): boolean {
-  const { left: start, right: end } = cursor
-  return start.key === end.key && start.offset === end.offset
+export function isCollapsed<P>(cursor: Cursor<P>): boolean {
+  return cursor != null && !isEqual(cursor.left, cursor.right)
 }
 
 export function setSelection(cursor: Cursor | null) {

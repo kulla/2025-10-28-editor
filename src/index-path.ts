@@ -94,7 +94,7 @@ function getRootEdgeRelation({
     : { type: EdgeRelationType.ThisNode }
 }
 
-function getIndexWithin(parentNode: F.FlatNode, childKey: Key): number {
+export function getIndexWithin(parentNode: F.FlatNode, childKey: Key): number {
   if (F.isKind('object', parentNode)) {
     return parentNode.schema.fieldOrder.findIndex(
       (property) => parentNode.value[property] === childKey,
