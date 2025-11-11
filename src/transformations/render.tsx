@@ -61,7 +61,9 @@ export function render({
         {...attributes}
         type="checkbox"
         checked={node.value}
-        onChange={() => void 0}
+        onChange={(e) =>
+          store.update((tx) => tx.update(node, () => e.target.checked))
+        }
       />
     )
   } else if (F.isKind('string', node)) {
