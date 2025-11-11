@@ -18,6 +18,7 @@ export const insertText: Command<{ text: string }> = ({
   const index = pos.left.path[0]
 
   tx.update(node, (prev) => prev.slice(0, index) + text + prev.slice(index))
+  tx.setCaret({ key: node.key, offset: index + text.length })
 
   return { type: CommandResultType.Success }
 }
