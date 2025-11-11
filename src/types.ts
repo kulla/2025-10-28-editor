@@ -11,3 +11,9 @@ export interface Iso<A, B> {
   to: (a: A) => B
   from: (b: B) => A
 }
+
+export type NonEmptyArray<T> = [T, ...T[]]
+
+export function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
+  return arr.length > 0
+}

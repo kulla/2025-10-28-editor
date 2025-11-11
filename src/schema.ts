@@ -1,5 +1,5 @@
 import type { FlatNode } from './flat-node'
-import type { NodePath } from './index-path'
+import type { NodeRangePosition } from './index-path'
 import type { EditorStore } from './store'
 import type { Iso, Key } from './types'
 
@@ -10,7 +10,7 @@ export function object<F extends Record<string, Schema>>(spec: {
   render?(args: {
     node: FlatNode<ObjectSchema<F>>
     store: EditorStore
-    nodePath: NodePath
+    nodePath: NodeRangePosition
     className?: string
   }): React.ReactNode
 }): ObjectSchema<F> {
@@ -137,7 +137,7 @@ export interface Schema {
   render?(args: {
     node: FlatNode
     store: EditorStore
-    nodePath: NodePath
+    nodePath: NodeRangePosition
     className?: string
   }): React.ReactNode
 }

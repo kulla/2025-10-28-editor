@@ -1,5 +1,10 @@
 import * as F from '../flat-node'
-import { createRootNodePath, type NodePath, pushIndex } from '../index-path'
+import {
+  EdgeRelationType,
+  getRootRangePosition,
+  type NodeRangePosition,
+  pushIndex,
+} from '../index-path'
 import type { Root } from '../nodes'
 import type { EditorStore } from '../store'
 import type { Key } from '../types'
@@ -14,6 +19,9 @@ export function renderRoot({
   onKeyDown: React.KeyboardEventHandler
 }): React.ReactNode {
   const { key } = node
+  const rootRangePosition = getRootRangePosition(store)
+  const childPos = pushIndex(rootRangePosition, 0)
+
   return (
     <article
       key={key}
@@ -25,11 +33,7 @@ export function renderRoot({
       onKeyDown={onKeyDown}
       onBeforeInput={() => {}}
     >
-      {render({
-        key: node.value,
-        store,
-        nodePath: createRootNodePath(store),
-      })}
+      {render({ key: node.value, store, nodePos: childPos })}
     </article>
   )
 }
@@ -37,19 +41,19 @@ export function renderRoot({
 export function render({
   key,
   store,
-  nodePath,
+  nodePos,
   className,
 }: {
   key: Key
   store: EditorStore
-  nodePath: NodePath
+  nodePos: NodeRangePosition
   className?: string
 }): React.ReactNode {
   const node = store.get(key)
   const attributes = { id: key, 'data-key': key }
 
   if ('render' in node.schema && typeof node.schema.render === 'function') {
-    return node.schema.render({ node, store, nodePath, className })
+    return node.schema.render({ node, store, nodePath: nodePos, className })
   } else if (F.isKind('boolean', node)) {
     return (
       <input
@@ -74,7 +78,7 @@ export function render({
           render({
             key: node.value[property],
             store,
-            nodePath: pushIndex(nodePath, index),
+            nodePos: pushIndex(nodePos, index),
           }),
         )}
       </HTMLTag>
@@ -82,7 +86,12 @@ export function render({
   } else if (F.isKind('array', node)) {
     const HTMLTag = node.schema.htmlTag ?? 'div'
 
-    const markRange = getMarkRange(nodePath)
+    const markRange =
+      nodePos != null &&
+      nodePos.left.type === EdgeRelationType.Inside &&
+      nodePos.right.type === EdgeRelationType.Inside
+        ? { start: nodePos.left.path[0], end: nodePos.right.path[0] }
+        : null
 
     return (
       <HTMLTag key={key} {...attributes} className={className}>
@@ -95,7 +104,7 @@ export function render({
           return render({
             key: itemKey,
             store,
-            nodePath: pushIndex(nodePath, index),
+            nodePos: pushIndex(nodePos, index),
             className: shouldMark ? 'selected' : undefined,
           })
         })}
@@ -106,45 +115,17 @@ export function render({
 
     return HTMLTag !== undefined ? (
       <HTMLTag key={key} {...attributes} className={className}>
-        {render({ key: node.value, store, nodePath: pushIndex(nodePath, 0) })}
+        {render({ key: node.value, store, nodePos: pushIndex(nodePos, 0) })}
       </HTMLTag>
     ) : (
       render({
         key: node.value,
         store,
-        nodePath: pushIndex(nodePath, 0),
+        nodePos: pushIndex(nodePos, 0),
         className,
       })
     )
   } else {
     throw new Error(`Unknown node kind: ${node.schema.kind}`)
   }
-}
-
-function getMarkRange(
-  nodePath: NodePath,
-): { start: number; end: number } | null {
-  const { cursor, currentNodePath } = nodePath
-  if (cursor == null) return null
-
-  const { left: start, right: end } = cursor
-
-  if (
-    start.length < currentNodePath.length + 1 ||
-    end.length < currentNodePath.length + 1
-  ) {
-    return null
-  }
-
-  for (let i = 0; i < currentNodePath.length; i++) {
-    if (start[i] !== currentNodePath[i]) return null
-    if (end[i] !== currentNodePath[i]) return null
-  }
-
-  const startIndex = start[currentNodePath.length]
-  const endIndex = end[currentNodePath.length]
-
-  if (startIndex === endIndex) return null
-
-  return { start: startIndex, end: endIndex }
 }

@@ -1,50 +1,84 @@
 import * as F from './flat-node'
-import type { Cursor } from './selection'
+import type { Cursor, Point } from './selection'
 import type { EditorStore } from './store'
-import type { Key } from './types'
+import { isNonEmptyArray, type Key, type NonEmptyArray } from './types'
 
-export interface NodePath {
-  cursor: Cursor<IndexPath> | null
-  currentNodePath: IndexPath
+export enum EdgeRelationType {
+  BeforeThisNode = 'beforeThisNode',
+  ThisNode = 'thisNode',
+  Inside = 'inside',
+  AfterThisNode = 'afterThisNode',
 }
 
-export function pushIndex(path: NodePath, index: number): NodePath {
+type EdgeRelationToNode =
+  | { type: EdgeRelationType.BeforeThisNode }
+  | { type: EdgeRelationType.ThisNode }
+  | { type: EdgeRelationType.Inside; path: NonEmptyArray<number> }
+  | { type: EdgeRelationType.AfterThisNode }
+
+export type NodeRangePosition = Cursor<EdgeRelationToNode> | null
+
+export function pushIndex(
+  path: NodeRangePosition,
+  index: number,
+): NodeRangePosition {
+  if (path == null) return null
+
   return {
-    cursor: path.cursor,
-    currentNodePath: [...path.currentNodePath, index],
+    left: pushEdgeIndex(path.left, index, 'left'),
+    right: pushEdgeIndex(path.right, index, 'right'),
   }
 }
 
-export function createRootNodePath(store: EditorStore): NodePath {
+function pushEdgeIndex(
+  edge: EdgeRelationToNode,
+  index: number,
+  edgeType: 'left' | 'right',
+): EdgeRelationToNode {
+  switch (edge.type) {
+    case EdgeRelationType.BeforeThisNode:
+    case EdgeRelationType.AfterThisNode:
+      return edge
+    case EdgeRelationType.ThisNode:
+      return edgeType === 'left'
+        ? { type: EdgeRelationType.BeforeThisNode }
+        : { type: EdgeRelationType.AfterThisNode }
+    case EdgeRelationType.Inside: {
+      const [selectedIndex, ...restPath] = edge.path
+
+      if (index < selectedIndex) {
+        return { type: EdgeRelationType.AfterThisNode }
+      } else if (index === selectedIndex) {
+        return isNonEmptyArray(restPath)
+          ? { type: EdgeRelationType.Inside, path: restPath }
+          : { type: EdgeRelationType.ThisNode }
+      } else {
+        return { type: EdgeRelationType.AfterThisNode }
+      }
+    }
+  }
+}
+
+export function getRootRangePosition(store: EditorStore): NodeRangePosition {
   const cursor = store.getCursor()
 
+  if (cursor == null) return null
+
   return {
-    cursor:
-      cursor == null
-        ? null
-        : {
-            left: getIndexPath({
-              node: store.get(cursor.left.key),
-              store,
-            }),
-            right: getIndexPath({
-              node: store.get(cursor.right.key),
-              store,
-            }),
-          },
-    currentNodePath: [0],
+    left: getRootEdgeRelation({ point: cursor.left, store }),
+    right: getRootEdgeRelation({ point: cursor.right, store }),
   }
 }
 
-function getIndexPath({
-  node,
+function getRootEdgeRelation({
+  point,
   store,
 }: {
-  node: F.FlatNode
+  point: Point
   store: EditorStore
-}) {
+}): EdgeRelationToNode {
   const result: number[] = []
-  let currentNode = node
+  let currentNode = store.get(point.key)
 
   while (currentNode.parentKey != null) {
     const parentNode = store.get(currentNode.parentKey)
@@ -55,7 +89,9 @@ function getIndexPath({
     currentNode = parentNode
   }
 
-  return result
+  return isNonEmptyArray(result)
+    ? { type: EdgeRelationType.Inside, path: result }
+    : { type: EdgeRelationType.ThisNode }
 }
 
 function getIndexWithin(parentNode: F.FlatNode, childKey: Key): number {
@@ -69,5 +105,3 @@ function getIndexWithin(parentNode: F.FlatNode, childKey: Key): number {
     return 0
   }
 }
-
-export type IndexPath = number[]

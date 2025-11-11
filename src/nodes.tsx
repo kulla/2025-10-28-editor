@@ -47,14 +47,14 @@ const MultipleChoiceExercise = S.object({
           {render({
             key: node.value.exercise,
             store,
-            nodePath: pushIndex(nodePath, 0),
+            nodePos: pushIndex(nodePath, 0),
           })}
         </div>
         <div>
           {render({
             key: node.value.answers,
             store,
-            nodePath: pushIndex(nodePath, 1),
+            nodePos: pushIndex(nodePath, 1),
           })}
         </div>
       </div>
