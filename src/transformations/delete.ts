@@ -2,6 +2,7 @@ import * as F from '../flat-node'
 import { EdgeRelationType } from '../index-path'
 import { isCollapsed } from '../selection'
 import { type Command, CommandResultType } from './command'
+import { mergeNeighbors } from './merge'
 
 export const deleteRange: Command = ({ node, tx, pos }) => {
   if (isCollapsed(pos)) return { type: CommandResultType.Failure }
@@ -32,15 +33,25 @@ export const deleteForward: Command = ({ node, tx, pos }) => {
 
     const index = pos.left.path[0]
 
-    if (index >= node.value.length) return { type: CommandResultType.Failure }
+    if (index >= node.value.length)
+      return { type: CommandResultType.DispatchParent }
 
     tx.update(node, (prev) => prev.slice(0, index) + prev.slice(index + 1))
     tx.setCaret({ key: node.key, offset: index })
 
     return { type: CommandResultType.Success }
+  } else if (
+    F.isKind('array', node) &&
+    pos.left.type === EdgeRelationType.Inside
+  ) {
+    const index = pos.left.path[0]
+
+    mergeNeighbors({ node, tx, index })
+
+    return { type: CommandResultType.Success }
   }
 
-  return { type: CommandResultType.Failure }
+  return { type: CommandResultType.DispatchParent }
 }
 
 export const deleteBackward: Command = ({ node, tx, pos }) => {

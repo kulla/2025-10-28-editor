@@ -29,3 +29,32 @@ export function selectBeginning({
     selectBeginning({ node: tx.store.get(firstPropertyKey), tx })
   }
 }
+
+export function selectEnding({
+  node,
+  tx,
+}: {
+  node: F.FlatNode
+  tx: Transaction
+}) {
+  if (F.isKind('string', node)) {
+    tx.setCaret({ key: node.key, offset: node.value.length })
+  } else if (F.isKind('boolean', node)) {
+    tx.setCaret({ key: node.key })
+  } else if (F.isKind('wrapper', node) || F.isKind('union', node)) {
+    selectEnding({ node: tx.store.get(node.value), tx })
+  } else if (F.isKind('array', node)) {
+    if (node.value.length === 0) {
+      tx.setCaret({ key: node.key })
+    } else {
+      const firstItemKey = node.value[0]
+
+      selectEnding({ node: tx.store.get(firstItemKey), tx })
+    }
+  } else if (F.isKind('object', node)) {
+    const firstProperty = node.schema.firstFieldKey ?? node.schema.fieldOrder[0]
+    const firstPropertyKey = node.value[firstProperty]
+
+    selectEnding({ node: tx.store.get(firstPropertyKey), tx })
+  }
+}
