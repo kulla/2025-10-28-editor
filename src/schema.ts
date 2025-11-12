@@ -28,6 +28,7 @@ export function union<OptionSchema extends Schema[]>(spec: {
 export function array<ItemSchema extends Schema>(spec: {
   item: ItemSchema
   htmlTag?: React.HTMLElementType
+  defaultLength?: number
 }): ArraySchema<ItemSchema> {
   return { kind: 'array', ...spec }
 }
@@ -46,6 +47,32 @@ export function string(): StringSchema {
 
 export function boolean(): BooleanSchema {
   return { kind: 'boolean' }
+}
+
+// TODO: There must be a better way to do this type of type narrowing
+
+export function isStringSchema(schema: Schema): schema is StringSchema {
+  return schema.kind === 'string'
+}
+
+export function isBooleanSchema(schema: Schema): schema is BooleanSchema {
+  return schema.kind === 'boolean'
+}
+
+export function isObjectSchema(schema: Schema): schema is ObjectSchema {
+  return schema.kind === 'object'
+}
+
+export function isArraySchema(schema: Schema): schema is ArraySchema {
+  return schema.kind === 'array'
+}
+
+export function isUnionSchema(schema: Schema): schema is UnionSchema {
+  return schema.kind === 'union'
+}
+
+export function isWrapperSchema(schema: Schema): schema is WrapperSchema {
+  return schema.kind === 'wrapper'
 }
 
 export type FlatValue<S extends Schema> = NonNullable<
@@ -82,6 +109,7 @@ export interface ArraySchema<ItemSchema extends Schema = Schema>
   kind: 'array'
   item: ItemSchema
   htmlTag?: React.HTMLElementType
+  defaultLength?: number
   [TypeInformation]?: {
     FlatValue: Key[]
     JSONValue: JSONValue<ItemSchema>[]

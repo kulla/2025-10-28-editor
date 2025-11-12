@@ -18,6 +18,7 @@ import {
 } from './transformations/delete'
 import { insertText } from './transformations/insert-text'
 import { loadJson } from './transformations/load'
+import { onEnter } from './transformations/on-enter'
 import { renderRoot } from './transformations/render'
 import { storeRoot } from './transformations/store'
 import type { Key } from './types'
@@ -47,7 +48,7 @@ export default function App() {
       if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
         dispatch({ command: insertText, store, payload: { text: event.key } })
       } else if (event.key === 'Enter') {
-        // manager.dispatchCommand(Command.InsertNewElement)
+        dispatch({ command: onEnter, store, payload: {} })
       } else if (event.key === 'Backspace') {
         if (isCollapsed(cursor)) {
           dispatch({ command: deleteBackward, store, payload: {} })

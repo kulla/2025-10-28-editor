@@ -27,6 +27,7 @@ const MultipleChoiceExercise = S.object({
         },
         fieldOrder: ['isCorrect', 'text'],
       }),
+      defaultLength: 2,
     }),
   },
   fieldOrder: ['exercise', 'answers'],

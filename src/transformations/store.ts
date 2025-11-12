@@ -18,7 +18,7 @@ export function storeRoot(args: {
   })
 }
 
-function store(args: {
+export function store(args: {
   tx: Transaction
   parentKey: Key
   node: N.NestedNode
