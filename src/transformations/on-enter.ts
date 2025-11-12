@@ -3,6 +3,7 @@ import { EdgeRelationType } from '../index-path'
 import { isCollapsed } from '../selection'
 import { type Command, CommandResultType } from './command'
 import { createEmptyNode } from './create-empty-node'
+import { selectBeginning } from './selection'
 import { store } from './store'
 
 export const onEnter: Command = ({ node, tx, pos }) => {
@@ -41,6 +42,8 @@ export const onEnter: Command = ({ node, tx, pos }) => {
         ...prev.slice(afterIndex + 1),
       ]
     })
+
+    selectBeginning({ node: tx.store.get(newNodeKey), tx })
 
     return { type: CommandResultType.Success }
   }
