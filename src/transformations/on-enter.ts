@@ -21,18 +21,12 @@ export const onEnter: Command = ({ node, tx, pos }) => {
         ? pos.left.path[0]
         : node.value.length - 1
 
-    console.log('Inserting new array item after index', afterIndex)
-
     const newValueSchema =
       node.value[afterIndex] != null
         ? tx.store.get(node.value[afterIndex]).schema
         : node.schema.item
 
-    console.log('New value schema', newValueSchema)
-
     const newValue = createEmptyNode(newValueSchema)
-
-    console.log('New value', newValue)
 
     const newNodeKey = store({
       tx,
