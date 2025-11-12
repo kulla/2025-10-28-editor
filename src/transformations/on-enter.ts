@@ -1,9 +1,11 @@
 import * as F from '../flat-node'
 import { EdgeRelationType } from '../index-path'
 import { isCollapsed } from '../selection'
+import { failure } from '../types'
 import { type Command, CommandResultType } from './command'
 import { createEmptyNode } from './create-empty-node'
 import { selectBeginning } from './selection'
+import { split } from './split'
 import { store } from './store'
 
 export const onEnter: Command = ({ node, tx, pos }) => {
@@ -21,13 +23,23 @@ export const onEnter: Command = ({ node, tx, pos }) => {
       pos.left.type === EdgeRelationType.Inside
         ? pos.left.path[0]
         : node.value.length - 1
+    const afterKey = node.value[afterIndex]
+
+    const splitResult =
+      pos.left.type === EdgeRelationType.Inside && afterKey != null
+        ? split({
+            node: tx.store.get(afterKey),
+            tx,
+            path: pos.left.path.slice(1),
+          })
+        : failure()
 
     const newValueSchema =
-      node.value[afterIndex] != null
-        ? tx.store.get(node.value[afterIndex]).schema
-        : node.schema.item
+      afterKey != null ? tx.store.get(afterKey).schema : node.schema.item
 
-    const newValue = createEmptyNode(newValueSchema)
+    const newValue = splitResult.success
+      ? splitResult.value()
+      : createEmptyNode(newValueSchema)
 
     const newNodeKey = store({
       tx,
