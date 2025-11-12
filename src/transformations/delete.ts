@@ -63,13 +63,22 @@ export const deleteBackward: Command = ({ node, tx, pos }) => {
 
     const index = pos.left.path[0]
 
-    if (index === 0) return { type: CommandResultType.Failure }
+    if (index === 0) return { type: CommandResultType.DispatchParent }
 
     tx.update(node, (prev) => prev.slice(0, index - 1) + prev.slice(index))
     tx.setCaret({ key: node.key, offset: index - 1 })
 
     return { type: CommandResultType.Success }
+  } else if (
+    F.isKind('array', node) &&
+    pos.left.type === EdgeRelationType.Inside
+  ) {
+    const index = pos.left.path[0]
+
+    mergeNeighbors({ node, tx, index: index - 1 })
+
+    return { type: CommandResultType.Success }
   }
 
-  return { type: CommandResultType.Failure }
+  return { type: CommandResultType.DispatchParent }
 }
