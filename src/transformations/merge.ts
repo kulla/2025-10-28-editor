@@ -21,6 +21,7 @@ export function mergeNeighbors({
 
   if (rightText == null) return
 
+  // TODO: Update only wgen successful
   selectEnding({ node: leftNode, tx })
 
   const added = addText({ node: leftNode, text: rightText, tx })
@@ -32,7 +33,7 @@ export function mergeNeighbors({
   }
 }
 
-function toText({
+export function toText({
   node,
   store,
 }: {
@@ -43,12 +44,14 @@ function toText({
     return node.value
   } else if (F.isKind('wrapper', node) || F.isKind('union', node)) {
     return toText({ node: store.get(node.value), store })
+  } else if (F.isKind('object', node) && node.schema.toText != null) {
+    return node.schema.toText({ node, store })
   } else {
     return null
   }
 }
 
-function addText({
+export function addText({
   node,
   text,
   tx,
@@ -60,6 +63,8 @@ function addText({
   if (F.isKind('string', node)) {
     tx.update(node, (prev) => prev + text)
     return true
+  } else if (F.isKind('object', node) && node.schema.addText != null) {
+    return node.schema.addText({ node, tx, text })
   } else if (F.isKind('wrapper', node) || F.isKind('union', node)) {
     return addText({ node: tx.store.get(node.value), text, tx })
   }

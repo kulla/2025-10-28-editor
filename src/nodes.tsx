@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { pushIndex } from './index-path'
 import * as S from './schema'
+import { addText, toText } from './transformations/merge'
 import { render } from './transformations/render'
 import { split } from './transformations/split'
 import { failure, success } from './types'
@@ -50,6 +51,12 @@ const MultipleChoiceExercise = S.object({
           }
 
           return failure()
+        },
+        toText({ node, store }) {
+          return toText({ node: store.get(node.value.text), store })
+        },
+        addText({ node, tx, text }) {
+          return addText({ node: tx.store.get(node.value.text), tx, text })
         },
       }),
       defaultLength: 2,

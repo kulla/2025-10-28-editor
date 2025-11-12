@@ -13,6 +13,15 @@ export function object<F extends Record<string, Schema>>(spec: {
     tx: Transaction
     path: number[]
   }) => Result<() => JSONValue<ObjectSchema<F>>>
+  toText?: (args: {
+    node: FlatNode<ObjectSchema<F>>
+    store: EditorStore
+  }) => string | null
+  addText?: (args: {
+    node: FlatNode<ObjectSchema<F>>
+    text: string
+    tx: Transaction
+  }) => boolean
   render?(args: {
     node: FlatNode<ObjectSchema<F>>
     store: EditorStore
@@ -105,6 +114,15 @@ export interface ObjectSchema<
   fieldOrder: Extract<keyof F, string>[]
   firstFieldKey?: Extract<keyof F, string>
   htmlTag: React.HTMLElementType
+  toText?: (args: {
+    node: FlatNode<ObjectSchema<F>>
+    store: EditorStore
+  }) => string | null
+  addText?: (args: {
+    node: FlatNode<ObjectSchema<F>>
+    text: string
+    tx: Transaction
+  }) => boolean
   split?: (args: {
     node: FlatNode<ObjectSchema<F>>
     tx: Transaction
