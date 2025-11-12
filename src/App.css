@@ -16,3 +16,8 @@ span[data-type="text"] {
 .exercise.multipleChoice {
   @apply p-4 mb-2 rounded-lg shadow-md bg-gray-100 dark:bg-gray-800 border-0;
 }
+
+span[data-type="text"]::after {
+  /* Render &nbsp; as a non-breaking space so that the span does not collapse */
+  content: "\0000A0";
+}
