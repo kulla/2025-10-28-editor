@@ -23,7 +23,7 @@ export function selectBeginning({
       selectBeginning({ node: tx.store.get(firstItemKey), tx })
     }
   } else if (F.isKind('object', node)) {
-    const firstProperty = node.schema.fieldOrder[0]
+    const firstProperty = node.schema.firstFieldKey ?? node.schema.fieldOrder[0]
     const firstPropertyKey = node.value[firstProperty]
 
     selectBeginning({ node: tx.store.get(firstPropertyKey), tx })

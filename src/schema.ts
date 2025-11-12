@@ -7,6 +7,7 @@ export function object<F extends Record<string, Schema>>(spec: {
   fields: F
   fieldOrder: Extract<keyof F, string>[]
   htmlTag?: React.HTMLElementType
+  firstFieldKey?: Extract<keyof F, string>
   render?(args: {
     node: FlatNode<ObjectSchema<F>>
     store: EditorStore
@@ -97,6 +98,7 @@ export interface ObjectSchema<
   kind: 'object'
   fields: F
   fieldOrder: Extract<keyof F, string>[]
+  firstFieldKey?: Extract<keyof F, string>
   htmlTag: React.HTMLElementType
   [TypeInformation]?: {
     FlatValue: { [K in keyof F]: Key }
