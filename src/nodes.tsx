@@ -2,6 +2,8 @@ import clsx from 'clsx'
 import { pushIndex } from './index-path'
 import * as S from './schema'
 import { render } from './transformations/render'
+import { split } from './transformations/split'
+import { failure, success } from './types'
 
 const Text = S.string()
 
@@ -27,6 +29,28 @@ const MultipleChoiceExercise = S.object({
         },
         fieldOrder: ['isCorrect', 'text'],
         firstFieldKey: 'text',
+        split({ node, tx, path }) {
+          if (path.length >= 1 && path[0] === 1) {
+            const splitText = split({
+              tx,
+              node: tx.store.get(node.value.text),
+              path: path.slice(1),
+            })
+
+            if (splitText.success) {
+              return success(() => {
+                const textAfter = splitText.value() as string
+
+                return {
+                  isCorrect: false,
+                  text: textAfter,
+                }
+              })
+            }
+          }
+
+          return failure()
+        },
       }),
       defaultLength: 2,
     }),

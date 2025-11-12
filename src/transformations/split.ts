@@ -44,6 +44,8 @@ export function split<S extends Schema>({
     } else {
       return failure()
     }
+  } else if (F.isKind('object', node) && node.schema.split != null) {
+    return node.schema.split({ node, tx, path })
   }
 
   return failure()

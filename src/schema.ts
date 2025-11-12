@@ -1,13 +1,18 @@
 import type { FlatNode } from './flat-node'
 import type { NodeRangePosition } from './index-path'
-import type { EditorStore } from './store'
-import type { Iso, Key } from './types'
+import type { EditorStore, Transaction } from './store'
+import type { Iso, Key, Result } from './types'
 
 export function object<F extends Record<string, Schema>>(spec: {
   fields: F
   fieldOrder: Extract<keyof F, string>[]
   htmlTag?: React.HTMLElementType
   firstFieldKey?: Extract<keyof F, string>
+  split?: (args: {
+    node: FlatNode<ObjectSchema<F>>
+    tx: Transaction
+    path: number[]
+  }) => Result<() => JSONValue<ObjectSchema<F>>>
   render?(args: {
     node: FlatNode<ObjectSchema<F>>
     store: EditorStore
@@ -100,6 +105,11 @@ export interface ObjectSchema<
   fieldOrder: Extract<keyof F, string>[]
   firstFieldKey?: Extract<keyof F, string>
   htmlTag: React.HTMLElementType
+  split?: (args: {
+    node: FlatNode<ObjectSchema<F>>
+    tx: Transaction
+    path: number[]
+  }) => Result<() => JSONValue<ObjectSchema<F>>>
   [TypeInformation]?: {
     FlatValue: { [K in keyof F]: Key }
     JSONValue: { [K in keyof F]: JSONValue<F[K]> }
