@@ -1,5 +1,7 @@
 # Prototype for an WYSIWYG editor
 
+This is an prototype for writing a WYSIWYG editor supporting (highly) structured data (in this case a multiple choice exercise). In this prototypes ideas from https://github.com/kulla/collaborative-wysiwyg-editor-for-structured-data are implemented and tested. In this case no editor framework like Slate.Js or ProseMirror is used.
+
 ## Setup
 
 1. Clone the repository
