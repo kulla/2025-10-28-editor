@@ -14,19 +14,19 @@
   "dependencies": {
     "@picocss/pico": "^2.1.1",
     "clsx": "^2.1.1",
-    "es-toolkit": "^1.41.0",
+    "es-toolkit": "^1.42.0",
     "js-beautify": "^1.15.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.5",
-    "@rsbuild/core": "^1.6.4",
+    "@rsbuild/core": "^1.6.9",
     "@rsbuild/plugin-react": "^1.4.2",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/js-beautify": "^1.14.3",
     "@types/react-dom": "^19.2.3",
-    "daisyui": "^5.5.0",
+    "daisyui": "^5.5.5",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3"
   }
